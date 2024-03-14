@@ -58,4 +58,4 @@ def move_decimal_point(binary_str, shift):
         if len(shifted_integer) == 0:
             shifted_integer = '0'
             
-    return shifted_integer + '.' + shifted_fractional\
+    return shifted_integer + '.' + shifted_fractional
