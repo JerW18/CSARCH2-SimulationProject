@@ -1,5 +1,5 @@
 # Float to Binary Conversion
-def float_to_binary(float_num, precision = 8):
+def float_to_binary(float_num, precision):
     integer_part = int(float_num)
     fractional_part = float_num - integer_part
 
@@ -14,7 +14,10 @@ def float_to_binary(float_num, precision = 8):
         binary_fractional += str(bit)
         fractional_part -= bit
 
-    return binary_integer + "." + binary_fractional
+    if len(binary_fractional) == 0:
+        return binary_integer
+    else:
+        return binary_integer + "." + binary_fractional
 
 # Move Decimal Point of a Number given the Shift
 # Positive shift: moves the decimal point to the right
@@ -59,3 +62,50 @@ def move_decimal_point(binary_str, shift):
             shifted_integer = '0'
             
     return shifted_integer + '.' + shifted_fractional
+
+# Add Two Binary Numbers
+def add_binary_numbers(binary_num1, binary_num2):
+    # Split the numbers into integer and fractional parts
+    int_part1, frac_part1 = binary_num1.split('.')
+    int_part2, frac_part2 = binary_num2.split('.')
+    
+    # Convert the integer parts to decimal
+    dec_num1 = int(int_part1, 2)
+    dec_num2 = int(int_part2, 2)
+    
+    # Convert the fractional parts to decimal
+    frac_num1 = int(frac_part1, 2) / (2 ** len(frac_part1))
+    frac_num2 = int(frac_part2, 2) / (2 ** len(frac_part2))
+    
+    sum_dec = dec_num1 + dec_num2 + frac_num1 + frac_num2
+    
+    # Convert the sum of fractional parts to binary
+    sum_binary = float_to_binary(sum_dec, precision=len(frac_part1))
+    
+    return sum_binary
+
+# Round to the Nearest Even (RTNE) Rounding
+def rtne_rounding(binary_str, num_bits):
+    integer_part, fractional_part = binary_str.split('.')
+    
+    num_bits = num_bits - 1
+    
+    if len(fractional_part) > num_bits:
+        round_bits, extra_bits = fractional_part[:num_bits], fractional_part[num_bits:]
+        
+        if extra_bits[0] == '1':
+            if round_bits[-1] == '1':
+                binary_str = add_binary_numbers(integer_part + '.' + round_bits, '0.' + '0' * (num_bits - 1) + '1')
+            else:
+                binary_str = integer_part + '.' + round_bits
+        else:
+            binary_str = integer_part + '.' + round_bits
+        
+    integer_part, fractional_part = binary_str.split('.')
+    
+    if len(fractional_part) < num_bits:
+        fractional_part += '0' * (num_bits - len(fractional_part))
+        return integer_part + '.' + fractional_part
+    else:
+        return binary_str
+    
