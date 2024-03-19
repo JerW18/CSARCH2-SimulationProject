@@ -89,7 +89,7 @@ def rtne_rounding(binary_str, num_bits):
     integer_part, fractional_part = binary_str.split('.')
     
     num_bits = num_bits - 1
-    
+    print("workinga")
     if len(fractional_part) > num_bits:
         round_bits, extra_bits = fractional_part[:num_bits], fractional_part[num_bits:]
         
@@ -106,13 +106,55 @@ def rtne_rounding(binary_str, num_bits):
             binary_str = integer_part + '.' + round_bits
         
     integer_part, fractional_part = binary_str.split('.')
-    
+    print("workingb")
     if len(fractional_part) < num_bits:
         fractional_part += '0' * (num_bits - len(fractional_part))
         return integer_part + '.' + fractional_part
     else:
         return binary_str
+
+def grs_rounding(binary_str, num_bits):
+    integer_part, fractional_part = binary_str.split('.')
     
+    num_bits = num_bits + 1
+    #truncate to num_bits -1
+    #if remaining bits has 1, append 1 to the last bit
+    #else, append 0
+    if len(fractional_part) > num_bits:
+        round_bits = fractional_part[:num_bits]
+        extra_bits = fractional_part[num_bits:]
+        #messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {round_bits}\nBinary 2: {extra_bits}")
+        if '1' in extra_bits:
+            #append 1 to the last bit
+            round_bits + '1'
+        else:
+            #append 0 to the last bit
+            round_bits + '0'
+    else:
+        round_bits = fractional_part
+        #append 0's
+        round_bits += '0' * (num_bits - len(fractional_part))
+        round_bits += '0'
+    
+    return integer_part + '.' + round_bits
+    # if len(fractional_part) > num_bits:
+    #     round_bits, extra_bits = fractional_part[:num_bits], fractional_part[num_bits:]
+        
+    #     if extra_bits[0] == '1' and not any(bit in '1' for bit in extra_bits[1:]):
+    #         if round_bits[-1] == '1':
+    #             binary_str = add_binary_numbers(integer_part + '.' + round_bits, '0.' + '0' * (num_bits - 1) + '1')
+    #         else:
+    #             binary_str = integer_part + '.' + round_bits
+                
+    #     elif extra_bits[0] == '1' and any(bit in '1' for bit in extra_bits[1:]):
+    #         binary_str = add_binary_numbers(integer_part + '.' + round_bits, '0.' + '0' * (num_bits - 1) + '1')
+            
+    #     else:
+    #         binary_str = integer_part + '.' + round_bits
+
+
+    
+
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -135,22 +177,59 @@ def perform_addition():
         elif exponent2 > exponent1:
             binary1 = move_decimal_point(binary1, exponent2 - exponent1)
             exponent1 = exponent2
-
-        messagebox.showinfo("Converted Binary Numbers", f"Binary 1: {binary1}\nBinary 2: {binary2}")
-
-
         result_exponent = max(exponent1, exponent2)
+
+        result_binary1 = f"[{binary1}] × 2^[{result_exponent}]"
+        result_binary2 = f"[{binary2}] × 2^[{result_exponent}]"
+        messagebox.showinfo("Normalized Binary Numbers", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}")
+
+
+        
         
         if(rounding_mode == "RTNE"):
             binary1 = rtne_rounding(binary1, num_digits)
             binary2 = rtne_rounding(binary2, num_digits)
+        elif(rounding_mode == "GRS"):
+            binary1 = grs_rounding(binary1, num_digits)
+            binary2 = grs_rounding(binary2, num_digits)
 
         # show converted binary numbers
-        messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {binary1}\nBinary 2: {binary2}")
+        result_binary1 = f"[{binary1}] × 2^[{result_exponent}]"
+        result_binary2 = f"[{binary2}] × 2^[{result_exponent}]"
+        messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}")
 
         # Perform addition
         #result_binary = float(binary1) + float(binary2)
+
         result_binary = add_binary_numbers(binary1, binary2)
+        if '.' not in result_binary:
+            result_binary += '.0'
+        result_binary = f"[{result_binary}] × 2^[{result_exponent}]"
+        messagebox.showinfo("Operation", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}\n--------------------------\nSUM: {result_binary}")
+        print("working outside")
+
+        # normalize the result
+
+        print(result_binary)
+        #if result_binary has no decimal, pad 0
+        if '.' not in result_binary:
+            result_binary += '.0'
+        integer_part, fractional_part = result_binary.split('.')
+        
+        #1.f <- need to check for this
+        #print(integer_part)
+        while integer_part[-1] != '1' and len(integer_part) > 1:
+            result_exponent += 1
+            result_binary = integer_part + '.' + fractional_part
+            result_binary = move_decimal_point(result_binary, 1)
+            integer_part, fractional_part = result_binary.split('.')
+
+        while integer_part[-1] != '1':
+            result_exponent -= 1
+            result_binary = integer_part + '.' + fractional_part
+            result_binary = move_decimal_point(result_binary, -1)
+            integer_part, fractional_part = result_binary.split('.')   
+        
         
         result_binary = rtne_rounding(result_binary, num_digits) 
         # Display the result
