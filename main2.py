@@ -28,6 +28,17 @@ def move_decimal_point(binary_str, shift):
     shifted_integer = ''
     shifted_fractional = ''
     
+    if '1' not in integer_part:
+        #shift fractional part to the left
+        if shift < 0 and fractional_part[0] != '1':
+            shifted_integer = '0'
+            shifted_fractional = fractional_part[1:] 
+            print("shifted_fractional", shifted_fractional)
+            return shifted_integer + '.' + shifted_fractional
+        else:
+            return '1.0'
+        
+
     # Shift the decimal point to the right
     if shift < 0:
         # Pad with zeros if the fractional part is shorter than the shift
@@ -44,6 +55,8 @@ def move_decimal_point(binary_str, shift):
         # If the shifted fractional part is empty make it 0
         if len(shifted_fractional) == 0:
             shifted_fractional = '0'
+        if len(shifted_integer) == 0:
+            shifted_integer = '0'
     
     # Shift the decimal point to the left    
     elif shift >= 0:
@@ -62,6 +75,8 @@ def move_decimal_point(binary_str, shift):
             shifted_integer = '0'
             
     return shifted_integer + '.' + shifted_fractional
+
+
 
 # Add Two Binary Numbers
 def add_binary_numbers(binary_num1, binary_num2):
@@ -92,7 +107,6 @@ def rtne_rounding(binary_str, num_bits):
         return integer_part
 
     num_bits = num_bits - 1
-    print("workinga")
     if len(fractional_part) > num_bits:
         round_bits, extra_bits = fractional_part[:num_bits], fractional_part[num_bits:]
         
@@ -111,9 +125,7 @@ def rtne_rounding(binary_str, num_bits):
     if '.' not in binary_str:
             binary_str += '.0'
             return binary_str
-    print(binary_str)
     integer_part, fractional_part = binary_str.split('.')
-    print("workingb")
     if len(fractional_part) < num_bits:
         fractional_part += '0' * (num_bits - len(fractional_part))
         return integer_part + '.' + fractional_part
@@ -130,8 +142,6 @@ def grs_rounding(binary_str, num_bits):
     if len(fractional_part) > num_bits:
         round_bits = fractional_part[:num_bits]
         extra_bits = fractional_part[num_bits:]
-        print(round_bits)
-        print(extra_bits)
         #messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {round_bits}\nBinary 2: {extra_bits}")
         if '1' in extra_bits:
             #append 1 to the last bit
@@ -153,29 +163,34 @@ def normalize_binary(binary_str, exponent):
     
     # Shift the decimal point to the right until the first '1' is encountered in the integer part
 
-    # while integer_part[-1] != '1' and len(integer_part) > 1:
-    #     exponent += 1
-    #     binary_str = integer_part + '.' + fractional_part
-    #     binary_str = move_decimal_point(binary_str, 1)
-    #     integer_part, fractional_part = binary_str.split('.')
-    #     #print(integer_part)
     if integer_part == '0' and fractional_part == '1':
         return '1.0', exponent - 1
-    while integer_part[-1] != '1':
+    if integer_part == '0' and fractional_part == '0':
+        return '0.0', 0
+    
+    while '1' not in integer_part and '1' in fractional_part:
         exponent -= 1
         binary_str = integer_part + '.' + fractional_part
         binary_str = move_decimal_point(binary_str, -1)
-        integer_part, fractional_part = binary_str.split('.') 
+        print("cc", binary_str)
+        #if fractional part is empty, pad 0
+        if integer_part == '0' and fractional_part == '1':
+            return '1.0', exponent - 1
+        integer_part, fractional_part = binary_str.split('.')
 
-
+    #while number of 1's in integer part is greater than 1, shihft
+    while integer_part.count('1') > 1 and len(integer_part) > 1:
+        exponent += 1
+        binary_str = integer_part + '.' + fractional_part
+        binary_str = move_decimal_point(binary_str, 1)
+        integer_part, fractional_part = binary_str.split('.')
 
     while len(integer_part) > 1:
         exponent += 1
         binary_str = integer_part + '.' + fractional_part
         binary_str = move_decimal_point(binary_str, 1)
         integer_part, fractional_part = binary_str.split('.')
-    
-    # Check if the leading digit is '0.1' and adjust accordingly
+
     
 
     return binary_str, exponent
@@ -188,13 +203,11 @@ def normalize_result(result_binary, result_exponent, num_digits):
     integer_part, fractional_part = result_binary.split('.')
         
         #1.f <- need to check for this
-    print(integer_part)
     while integer_part[-1] != '1' and len(integer_part) > 1:
         result_exponent += 1
         result_binary = integer_part + '.' + fractional_part
         result_binary = move_decimal_point(result_binary, 1)
         integer_part, fractional_part = result_binary.split('.')
-        #print(integer_part)
     while integer_part[-1] != '1' and len(integer_part) > 1:
         result_exponent -= 1
         result_binary = integer_part + '.' + fractional_part
@@ -293,16 +306,14 @@ def perform_addition():
             round_binary1 += '.0'
         if '.' not in round_binary2:
             round_binary2 += '.0'
-        print("will add")
         result_binary = add_binary_numbers(round_binary1, round_binary2)
         result_exponent = max(exponent1, exponent2)
         text_output.insert(tk.END, "-------------------------------------------------\n")
-        print("added")
         if num_digits > 1:
             if '.' not in result_binary:
                 result_binary += '.0'
-            if len(result_binary) < num_digits+3 and rounding_mode == "GRS":
-                result_binary += '0' * (num_digits+3 - len(result_binary))
+            if len(result_binary) < num_digits+4 and rounding_mode == "GRS":
+                result_binary += '0' * (num_digits+4 - len(result_binary))
             elif len(result_binary) < num_digits+1 and rounding_mode == "RTNE":
                 result_binary += '0' * (num_digits+1 - len(result_binary))
         text_output.insert(tk.END, f"     Sum: [{result_binary}] x 2^{result_exponent}\n\n")
