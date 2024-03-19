@@ -117,30 +117,30 @@ def rtne_rounding(binary_str, num_bits):
     else:
         return binary_str
 
-def grs_rounding(binary_str, num_bits):
-    integer_part, fractional_part = binary_str.split('.')
+# def grs_rounding(binary_str, num_bits):
+#     integer_part, fractional_part = binary_str.split('.')
     
-    num_bits = num_bits + 1
-    #truncate to num_bits -1
-    #if remaining bits has 1, append 1 to the last bit
-    #else, append 0
-    if len(fractional_part) > num_bits:
-        round_bits = fractional_part[:num_bits]
-        extra_bits = fractional_part[num_bits:]
-        #messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {round_bits}\nBinary 2: {extra_bits}")
-        if '1' in extra_bits:
-            #append 1 to the last bit
-            round_bits + '1'
-        else:
-            #append 0 to the last bit
-            round_bits + '0'
-    else:
-        round_bits = fractional_part
-        #append 0's
-        round_bits += '0' * (num_bits - len(fractional_part))
-        round_bits += '0'
+#     num_bits = num_bits + 1
+#     #truncate to num_bits -1
+#     #if remaining bits has 1, append 1 to the last bit
+#     #else, append 0
+#     if len(fractional_part) > num_bits:
+#         round_bits = fractional_part[:num_bits]
+#         extra_bits = fractional_part[num_bits:]
+#         #messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {round_bits}\nBinary 2: {extra_bits}")
+#         if '1' in extra_bits:
+#             #append 1 to the last bit
+#             round_bits + '1'
+#         else:
+#             #append 0 to the last bit
+#             round_bits + '0'
+#     else:
+#         round_bits = fractional_part
+#         #append 0's
+#         round_bits += '0' * (num_bits - len(fractional_part))
+#         round_bits += '0'
     
-    return integer_part + '.' + round_bits
+#     return integer_part + '.' + round_bits
 
 
 
@@ -225,8 +225,8 @@ def perform_addition():
             binary1 = rtne_rounding(binary1, num_digits)
             binary2 = rtne_rounding(binary2, num_digits)
         elif(rounding_mode == "GRS"):
-            binary1 = grs_rounding(binary1, num_digits)
-            binary2 = grs_rounding(binary2, num_digits)
+            binary1 = rtne_rounding(binary1, num_digits + 3)
+            binary2 = rtne_rounding(binary2, num_digits + 3)
 
         # show converted binary numbers
         result_binary1 = f"[{binary1}] x 2^[{result_exponent}]"
