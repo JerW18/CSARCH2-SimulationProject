@@ -88,6 +88,9 @@ def add_binary_numbers(binary_num1, binary_num2):
 def rtne_rounding(binary_str, num_bits):
     integer_part, fractional_part = binary_str.split('.')
     
+    if num_bits == 1:
+        return integer_part
+
     num_bits = num_bits - 1
     print("workinga")
     if len(fractional_part) > num_bits:
@@ -145,17 +148,38 @@ def grs_rounding(binary_str, num_bits):
     return integer_part + '.' + round_bits
 
 
-# Normalize Binary
 def normalize_binary(binary_str, exponent):
     integer_part, fractional_part = binary_str.split('.')
     
+    # Shift the decimal point to the right until the first '1' is encountered in the integer part
+
+    # while integer_part[-1] != '1' and len(integer_part) > 1:
+    #     exponent += 1
+    #     binary_str = integer_part + '.' + fractional_part
+    #     binary_str = move_decimal_point(binary_str, 1)
+    #     integer_part, fractional_part = binary_str.split('.')
+    #     #print(integer_part)
+    if integer_part == '0' and fractional_part == '1':
+        return '1.0', exponent - 1
+    while integer_part[-1] != '1':
+        exponent -= 1
+        binary_str = integer_part + '.' + fractional_part
+        binary_str = move_decimal_point(binary_str, -1)
+        integer_part, fractional_part = binary_str.split('.') 
+
+
+
     while len(integer_part) > 1:
         exponent += 1
         binary_str = integer_part + '.' + fractional_part
         binary_str = move_decimal_point(binary_str, 1)
         integer_part, fractional_part = binary_str.split('.')
-        
+    
+    # Check if the leading digit is '0.1' and adjust accordingly
+    
+
     return binary_str, exponent
+
 
 # Normalize Result
 def normalize_result(result_binary, result_exponent, num_digits):
@@ -265,15 +289,26 @@ def perform_addition():
         text_output.insert(tk.END, f"Binary 2: [{round_binary2}] x 2^{exponent2}\n")
 
         # Perform addition
+        if '.' not in round_binary1:
+            round_binary1 += '.0'
+        if '.' not in round_binary2:
+            round_binary2 += '.0'
+        print("will add")
         result_binary = add_binary_numbers(round_binary1, round_binary2)
         result_exponent = max(exponent1, exponent2)
         text_output.insert(tk.END, "-------------------------------------------------\n")
-        if '.' not in result_binary:
-            result_binary += '.0'
-#maybe change to pad 0's
-        text_output.insert(tk.END, f"Sum: [{result_binary}] x 2^{result_exponent}\n\n")
+        print("added")
+        if num_digits > 1:
+            if '.' not in result_binary:
+                result_binary += '.0'
+            if len(result_binary) < num_digits+3 and rounding_mode == "GRS":
+                result_binary += '0' * (num_digits+3 - len(result_binary))
+            elif len(result_binary) < num_digits+1 and rounding_mode == "RTNE":
+                result_binary += '0' * (num_digits+1 - len(result_binary))
+        text_output.insert(tk.END, f"     Sum: [{result_binary}] x 2^{result_exponent}\n\n")
 
         # Normalize the result
+        
         
         result_binary, result_exponent = normalize_result(result_binary, result_exponent, num_digits)
 
