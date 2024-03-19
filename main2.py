@@ -143,12 +143,64 @@ def grs_rounding(binary_str, num_bits):
     return integer_part + '.' + round_bits
 
 
-
+# Normalize Binary
+def normalize_binary(binary_str, exponent):
+    integer_part, fractional_part = binary_str.split('.')
     
+    while len(integer_part) > 1:
+        exponent += 1
+        binary_str = integer_part + '.' + fractional_part
+        binary_str = move_decimal_point(binary_str, 1)
+        integer_part, fractional_part = binary_str.split('.')
+        
+    return binary_str, exponent
+
+# Normalize Result
+def normalize_result(result_binary, result_exponent, num_digits):
+    if '.' not in result_binary:
+        result_binary += '.0'
+    integer_part, fractional_part = result_binary.split('.')
+        
+        #1.f <- need to check for this
+    print(integer_part)
+    while integer_part[-1] != '1' and len(integer_part) > 1:
+        result_exponent += 1
+        result_binary = integer_part + '.' + fractional_part
+        result_binary = move_decimal_point(result_binary, 1)
+        integer_part, fractional_part = result_binary.split('.')
+        #print(integer_part)
+    while integer_part[-1] != '1' and len(integer_part) > 1:
+        result_exponent -= 1
+        result_binary = integer_part + '.' + fractional_part
+        result_binary = move_decimal_point(result_binary, -1)
+        integer_part, fractional_part = result_binary.split('.')   
+        
+    while len(integer_part) > 1:
+        result_exponent += 1
+        result_binary = integer_part + '.' + fractional_part
+        result_binary = move_decimal_point(result_binary, 1)
+        integer_part, fractional_part = result_binary.split('.')
+    result_binary = rtne_rounding(result_binary, num_digits) 
+    return result_binary, result_exponent
+
+def save_output():
+    try:
+        output_text = text_output.get(1.0, tk.END)
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(output_text)
+            messagebox.showinfo("File Saved", "Output has been successfully saved to the text file.")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred while saving the file: {e}")
+
+
+
 
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
+
 
 def perform_addition():
     try:
@@ -159,124 +211,79 @@ def perform_addition():
         rounding_mode = var_rounding_mode.get()
         num_digits = int(entry_num_digits.get())
 
-        #if input values are not in binary, reject and show error and return
-        # if not all(bit in '01' for bit in binary1) or not all(bit in '01' for bit in binary2):
-        #     #raise ValueError("The input values are not in binary format.")
-        #     messagebox.showinfo("Not Binary", f"Incorrect input format. Please input binary numbers.")
-        #     return
-        #if the input values contain more than 1 decimal point, reject and show error and return
+        # Clear previous text from the output Text widget
+        text_output.delete(1.0, tk.END)
+
+        # Check input validity
         if binary1.count('.') > 1 or binary2.count('.') > 1:
-            messagebox.showinfo("Not Binary", f"Incorrect input format. Please input binary numbers.")
+            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
             return
-        #if any of the input values are empty, reject and show error and return
         if len(binary1) == 0 or len(binary2) == 0 or len(entry_exponent1.get()) == 0 or len(entry_exponent2.get()) == 0 or len(entry_num_digits.get()) == 0:
-            messagebox.showinfo("Empty Input", f"Please input both binary numbers.")
+            text_output.insert(tk.END, "Error: Please input both binary numbers and exponents.")
             return
-        #if the input is a negative number, reject and show error and return
         if '-' in binary1 or '-' in binary2:
-            messagebox.showinfo("Negative Number", f"Please input positive binary numbers.")
+            text_output.insert(tk.END, "Error: Please input positive binary numbers.")
             return
 
-
-        #normalize both values to 1.f
-        if('.' not in binary1):
+        # Normalize input values
+        if '.' not in binary1:
             binary1 += '.0'
-        if('.' not in binary2):
+        if '.' not in binary2:
             binary2 += '.0'
+        
+        # Shift the decimal point to make it n.f
+        normalize_binary1, exponent1 = normalize_binary(binary1, exponent1)
+        normalize_binary2, exponent2 = normalize_binary(binary2, exponent2)
 
-        #if the integer part has more than 1 digit, normalize it to n.f
-        integer_part, fractional_part = binary1.split('.')
-        while len(integer_part) > 1:
-            exponent1 += 1
-            binary1 = integer_part + '.' + fractional_part
-            binary1 = move_decimal_point(binary1, 1)
-            integer_part, fractional_part = binary1.split('.')
-        integer_part, fractional_part = binary2.split('.')
-        while len(integer_part) > 1:
-            exponent2 += 1
-            binary2 = integer_part + '.' + fractional_part
-            binary2 = move_decimal_point(binary2, 1)
-            integer_part, fractional_part = binary2.split('.')
-
-        # check which exponent is larger
+        # Normalize the binary numbers to the larger exponent
         if exponent1 > exponent2:
-            binary2 = move_decimal_point(binary2, exponent1 - exponent2)
+            normalize_binary2 = move_decimal_point(normalize_binary2, exponent1 - exponent2)
             exponent2 = exponent1
         elif exponent2 > exponent1:
-            binary1 = move_decimal_point(binary1, exponent2 - exponent1)
+            normalize_binary1 = move_decimal_point(normalize_binary1, exponent2 - exponent1)
             exponent1 = exponent2
         result_exponent = max(exponent1, exponent2)
 
-        result_binary1 = f"[{binary1}] x 2^[{result_exponent}]"
-        result_binary2 = f"[{binary2}] x 2^[{result_exponent}]"
-        messagebox.showinfo("Normalized Binary Numbers", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}")
+        # Display normalized binary numbers
+        text_output.insert(tk.END, "Normalized Binary Numbers:\n")
+        text_output.insert(tk.END, f"Binary 1: [{normalize_binary1}] x 2^{exponent1}\n")
+        text_output.insert(tk.END, f"Binary 2: [{normalize_binary2}] x 2^{exponent2}\n\n")
 
-        #pad 0's already
-        # if(len(binary1) < num_digits+1):
-        #     binary1 += '0' * (num_digits - len(binary1))
-        # if(len(binary2) < num_digits+1):
-        #     binary2 += '0' * (num_digits - len(binary2))
-        # result_binary1 = f"[{binary1}] x 2^[{result_exponent}]"
-        # result_binary2 = f"[{binary2}] x 2^[{result_exponent}]"
-        # messagebox.showinfo("Padded Binary Numbers", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}")
-        
-        # Round the binary numbers
-        if(rounding_mode == "RTNE"):
-            binary1 = rtne_rounding(binary1, num_digits)
-            binary2 = rtne_rounding(binary2, num_digits)
-        elif(rounding_mode == "GRS"):
-            binary1 = grs_rounding(binary1, num_digits)
-            binary2 = grs_rounding(binary2, num_digits)
+        # Perform rounding based on selected rounding mode
+        if rounding_mode == "RTNE":
+            round_binary1 = rtne_rounding(normalize_binary1, num_digits)
+            round_binary2 = rtne_rounding(normalize_binary2, num_digits)
+        elif rounding_mode == "GRS":
+            round_binary1 = grs_rounding(normalize_binary1, num_digits)
+            round_binary2 = grs_rounding(normalize_binary2, num_digits)
 
-        # show converted binary numbers
-        result_binary1 = f"[{binary1}] x 2^[{result_exponent}]"
-        result_binary2 = f"[{binary2}] x 2^[{result_exponent}]"
-        messagebox.showinfo("Rounded Binary Numbers", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}")
+        # Display rounded binary numbers
+        text_output.insert(tk.END, "Rounded Binary Numbers:\n")
+        text_output.insert(tk.END, f"Binary 1: [{round_binary1}] x 2^{exponent1}\n")
+        text_output.insert(tk.END, f"Binary 2: [{round_binary2}] x 2^{exponent2}\n")
 
         # Perform addition
-        result_binary = add_binary_numbers(binary1, binary2)
+        result_binary = add_binary_numbers(round_binary1, round_binary2)
+        result_exponent = max(exponent1, exponent2)
+        text_output.insert(tk.END, "-------------------------------------------------\n")
         if '.' not in result_binary:
             result_binary += '.0'
-        result_binary_sum = f"[{result_binary}] x 2^[{result_exponent}]"
-        messagebox.showinfo("Operation", f"Binary 1: {result_binary1}\nBinary 2: {result_binary2}\n--------------------------\nSUM: {result_binary_sum}")
-        print("working outside")
+#maybe change to pad 0's
+        text_output.insert(tk.END, f"Sum: [{result_binary}] x 2^{result_exponent}\n\n")
 
-        # normalize the result
+        # Normalize the result
+        
+        result_binary, result_exponent = normalize_result(result_binary, result_exponent, num_digits)
 
-        print(result_binary)
-        #if result_binary has no decimal, pad 0
-        if '.' not in result_binary:
-            result_binary += '.0'
-        integer_part, fractional_part = result_binary.split('.')
-        
-        #1.f <- need to check for this
-        print(integer_part)
-        while integer_part[-1] != '1' and len(integer_part) > 1:
-            result_exponent += 1
-            result_binary = integer_part + '.' + fractional_part
-            result_binary = move_decimal_point(result_binary, 1)
-            integer_part, fractional_part = result_binary.split('.')
-        print(integer_part)
-        while integer_part[-1] != '1' and len(integer_part) > 1:
-            result_exponent -= 1
-            result_binary = integer_part + '.' + fractional_part
-            result_binary = move_decimal_point(result_binary, -1)
-            integer_part, fractional_part = result_binary.split('.')   
-        
-        while len(integer_part) > 1:
-            result_exponent += 1
-            result_binary = integer_part + '.' + fractional_part
-            result_binary = move_decimal_point(result_binary, 1)
-            integer_part, fractional_part = result_binary.split('.')
+        # Display final result
+        text_output.insert(tk.END, "Final Answer:\n")
+        text_output.insert(tk.END, f"Answer: [{result_binary}] x 2^{result_exponent}\n")
 
-        
-        result_binary = rtne_rounding(result_binary, num_digits) 
-        # Display the result
-        result_str = f"[{result_binary}] x 2^[{result_exponent}]"
-        messagebox.showinfo("Final Answer", f"The Final Answer is: {result_str}")
+        #save_output(text_output.get(1.0, tk.END))
 
     except Exception as e:
-        messagebox.showerror("Error", f"An error occurred: {e}")
+        text_output.insert(tk.END, f"Error: An error occurred: {e}")
+
 
 # GUI setup
 root = tk.Tk()
@@ -313,7 +320,6 @@ radio_grs.grid(row=4, column=1, padx=5, pady=5)
 radio_rtne = tk.Radiobutton(root, text="RTNE (Round to Nearest Even)", variable=var_rounding_mode, value="RTNE")
 radio_rtne.grid(row=5, column=1, padx=5, pady=5)
 
-
 # Number of digits supported
 label_num_digits = tk.Label(root, text="Number of Digits Supported:")
 label_num_digits.grid(row=6, column=0, padx=5, pady=5)
@@ -323,5 +329,13 @@ entry_num_digits.grid(row=6, column=1, padx=5, pady=5)
 # Perform addition button
 button_add = tk.Button(root, text="Perform Addition", command=perform_addition)
 button_add.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
+
+# Output Text widget
+text_output = tk.Text(root, width=50, height=15)
+text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
+
+button_save_output = tk.Button(root, text="Save Output", command=save_output)
+button_save_output.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
+
 
 root.mainloop()
