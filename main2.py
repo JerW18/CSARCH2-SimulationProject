@@ -28,15 +28,17 @@ def move_decimal_point(binary_str, shift):
     shifted_integer = ''
     shifted_fractional = ''
     
-    if '1' not in integer_part:
+    if '1' not in integer_part and '1' in fractional_part:
         #shift fractional part to the left
         if shift < 0 and fractional_part[0] != '1':
             shifted_integer = '0'
             shifted_fractional = fractional_part[1:] 
             print("shifted_fractional", shifted_fractional)
             return shifted_integer + '.' + shifted_fractional
-        else:
-            return '1.0'
+        elif shift < 0 and fractional_part[0] == '1':
+            shifted_integer = '1'
+            shifted_fractional = fractional_part[1:]
+            return shifted_integer + '.' + shifted_fractional
         
 
     # Shift the decimal point to the right
@@ -174,8 +176,8 @@ def normalize_binary(binary_str, exponent):
         binary_str = move_decimal_point(binary_str, -1)
         print("cc", binary_str)
         #if fractional part is empty, pad 0
-        if integer_part == '0' and fractional_part == '1':
-            return '1.0', exponent - 1
+        #if integer_part == '0' and fractional_part == '1':
+            #return '1.0', exponent - 1
         integer_part, fractional_part = binary_str.split('.')
 
     #while number of 1's in integer part is greater than 1, shihft
@@ -274,6 +276,10 @@ def perform_addition():
         normalize_binary1, exponent1 = normalize_binary(binary1, exponent1)
         normalize_binary2, exponent2 = normalize_binary(binary2, exponent2)
 
+        text_output.insert(tk.END, "Normalized Binary Numbers:\n")
+        text_output.insert(tk.END, f"Binary 1: [{normalize_binary1}] x 2^{exponent1}\n")
+        text_output.insert(tk.END, f"Binary 2: [{normalize_binary2}] x 2^{exponent2}\n\n")
+
         # Normalize the binary numbers to the larger exponent
         if exponent1 > exponent2:
             normalize_binary2 = move_decimal_point(normalize_binary2, exponent1 - exponent2)
@@ -284,7 +290,7 @@ def perform_addition():
         result_exponent = max(exponent1, exponent2)
 
         # Display normalized binary numbers
-        text_output.insert(tk.END, "Normalized Binary Numbers:\n")
+        text_output.insert(tk.END, "Same Exponent Binary Numbers:\n")
         text_output.insert(tk.END, f"Binary 1: [{normalize_binary1}] x 2^{exponent1}\n")
         text_output.insert(tk.END, f"Binary 2: [{normalize_binary2}] x 2^{exponent2}\n\n")
 
