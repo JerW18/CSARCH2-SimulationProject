@@ -245,7 +245,12 @@ def normalize_binary(binary_str, exponent):
         
     if '-' not in binary_str and negative == '-':
         binary_str = negative + binary_str
-        
+    if '.' not in binary_str:
+        binary_str += '.0'
+    if binary_str[-1] == '.':
+        binary_str = binary_str + '0'
+
+
     return binary_str, exponent
 
 # Normalize Result
@@ -430,7 +435,7 @@ button_add = tk.Button(root, text="Perform Addition", command=perform_addition)
 button_add.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
 
 # Output Text widget
-text_output = tk.Text(root, width=50, height=15)
+text_output = tk.Text(root, width=50, height=17)
 text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
 
 button_save_output = tk.Button(root, text="Save Output", command=save_output)
