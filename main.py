@@ -145,8 +145,6 @@ def add_binary_numbers(binary_num1, binary_num2):
     
     return sum_binary
 
-print(add_binary_numbers('-110.10110', '110.10111'))
-
 # Round to the Nearest Even (RTNE) Rounding
 def rtne_rounding(binary_str, num_bits):
     integer_part, fractional_part = binary_str.split('.')
@@ -209,6 +207,11 @@ def grs_rounding(binary_str, num_bits):
 # Normalize Binary to 1.f
 def normalize_binary(binary_str, exponent):
     integer_part, fractional_part = binary_str.split('.')
+    negative = ''
+    
+    if '-' in integer_part:
+        integer_part = integer_part[1:]
+        negative = '-'
     
     # Shift the decimal point to the right until the first '1' is encountered in the integer part
 
@@ -227,7 +230,7 @@ def normalize_binary(binary_str, exponent):
             #return '1.0', exponent - 1
         integer_part, fractional_part = binary_str.split('.')
 
-    #while number of 1's in integer part is greater than 1, shihft
+    #while number of 1's in integer part is greater than 1, shift
     while integer_part.count('1') > 1 and len(integer_part) > 1:
         exponent += 1
         binary_str = integer_part + '.' + fractional_part
@@ -239,6 +242,9 @@ def normalize_binary(binary_str, exponent):
         binary_str = integer_part + '.' + fractional_part
         binary_str = move_decimal_point(binary_str, 1)
         integer_part, fractional_part = binary_str.split('.')
+        
+    if '-' not in binary_str and negative == '-':
+        binary_str = negative + binary_str
         
     return binary_str, exponent
 
@@ -260,7 +266,12 @@ def normalize_result(result_binary, result_exponent, num_digits):
         result_binary = move_decimal_point(result_binary, -1)
         integer_part, fractional_part = result_binary.split('.')   
         
-    while len(integer_part) > 1:
+    while len(integer_part) > 1 and '-' not in integer_part:
+        result_exponent += 1
+        result_binary = integer_part + '.' + fractional_part
+        result_binary = move_decimal_point(result_binary, 1)
+        integer_part, fractional_part = result_binary.split('.')
+    while len(integer_part) > 1 and '-' not in integer_part:
         result_exponent += 1
         result_binary = integer_part + '.' + fractional_part
         result_binary = move_decimal_point(result_binary, 1)
@@ -373,57 +384,57 @@ def perform_addition():
         text_output.insert(tk.END, f"Error: An error occurred: {e}")
 
 
-# # GUI setup
-# root = tk.Tk()
-# root.title("Binary Addition")
+# GUI setup
+root = tk.Tk()
+root.title("Binary Addition")
 
-# # Operand 1 inputs
-# label_binary1 = tk.Label(root, text="Input First Binary:")
-# label_binary1.grid(row=0, column=0, padx=5, pady=5)
-# entry_binary1 = tk.Entry(root)
-# entry_binary1.grid(row=0, column=1, padx=5, pady=5)
+# Operand 1 inputs
+label_binary1 = tk.Label(root, text="Input First Binary:")
+label_binary1.grid(row=0, column=0, padx=5, pady=5)
+entry_binary1 = tk.Entry(root)
+entry_binary1.grid(row=0, column=1, padx=5, pady=5)
 
-# label_exponent1 = tk.Label(root, text="Input First Exponent:")
-# label_exponent1.grid(row=1, column=0, padx=5, pady=5)
-# entry_exponent1 = tk.Entry(root)
-# entry_exponent1.grid(row=1, column=1, padx=5, pady=5)
+label_exponent1 = tk.Label(root, text="Input First Exponent:")
+label_exponent1.grid(row=1, column=0, padx=5, pady=5)
+entry_exponent1 = tk.Entry(root)
+entry_exponent1.grid(row=1, column=1, padx=5, pady=5)
 
-# # Operand 2 inputs
-# label_binary2 = tk.Label(root, text="Input Second Binary:")
-# label_binary2.grid(row=2, column=0, padx=5, pady=5)
-# entry_binary2 = tk.Entry(root)
-# entry_binary2.grid(row=2, column=1, padx=5, pady=5)
+# Operand 2 inputs
+label_binary2 = tk.Label(root, text="Input Second Binary:")
+label_binary2.grid(row=2, column=0, padx=5, pady=5)
+entry_binary2 = tk.Entry(root)
+entry_binary2.grid(row=2, column=1, padx=5, pady=5)
 
-# label_exponent2 = tk.Label(root, text="Input Second Exponent:")
-# label_exponent2.grid(row=3, column=0, padx=5, pady=5)
-# entry_exponent2 = tk.Entry(root)
-# entry_exponent2.grid(row=3, column=1, padx=5, pady=5)
+label_exponent2 = tk.Label(root, text="Input Second Exponent:")
+label_exponent2.grid(row=3, column=0, padx=5, pady=5)
+entry_exponent2 = tk.Entry(root)
+entry_exponent2.grid(row=3, column=1, padx=5, pady=5)
 
-# # Rounding mode selection
-# label_rounding_mode = tk.Label(root, text="Rounding Mode:")
-# label_rounding_mode.grid(row=4, column=0, padx=5, pady=5)
-# var_rounding_mode = tk.StringVar(value="GRS")  # Default to GRS rounding
-# radio_grs = tk.Radiobutton(root, text="GRS (Guard, Round, Sticky)", variable=var_rounding_mode, value="GRS")
-# radio_grs.grid(row=4, column=1, padx=5, pady=5)
-# radio_rtne = tk.Radiobutton(root, text="RTNE (Round to Nearest Even)", variable=var_rounding_mode, value="RTNE")
-# radio_rtne.grid(row=5, column=1, padx=5, pady=5)
+# Rounding mode selection
+label_rounding_mode = tk.Label(root, text="Rounding Mode:")
+label_rounding_mode.grid(row=4, column=0, padx=5, pady=5)
+var_rounding_mode = tk.StringVar(value="GRS")  # Default to GRS rounding
+radio_grs = tk.Radiobutton(root, text="GRS (Guard, Round, Sticky)", variable=var_rounding_mode, value="GRS")
+radio_grs.grid(row=4, column=1, padx=5, pady=5)
+radio_rtne = tk.Radiobutton(root, text="RTNE (Round to Nearest Even)", variable=var_rounding_mode, value="RTNE")
+radio_rtne.grid(row=5, column=1, padx=5, pady=5)
 
-# # Number of digits supported
-# label_num_digits = tk.Label(root, text="Number of Digits Supported:")
-# label_num_digits.grid(row=6, column=0, padx=5, pady=5)
-# entry_num_digits = tk.Entry(root)
-# entry_num_digits.grid(row=6, column=1, padx=5, pady=5)
+# Number of digits supported
+label_num_digits = tk.Label(root, text="Number of Digits Supported:")
+label_num_digits.grid(row=6, column=0, padx=5, pady=5)
+entry_num_digits = tk.Entry(root)
+entry_num_digits.grid(row=6, column=1, padx=5, pady=5)
 
-# # Perform addition button
-# button_add = tk.Button(root, text="Perform Addition", command=perform_addition)
-# button_add.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
+# Perform addition button
+button_add = tk.Button(root, text="Perform Addition", command=perform_addition)
+button_add.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
 
-# # Output Text widget
-# text_output = tk.Text(root, width=50, height=15)
-# text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
+# Output Text widget
+text_output = tk.Text(root, width=50, height=15)
+text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
 
-# button_save_output = tk.Button(root, text="Save Output", command=save_output)
-# button_save_output.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
+button_save_output = tk.Button(root, text="Save Output", command=save_output)
+button_save_output.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
 
 
-# root.mainloop()
+root.mainloop()
