@@ -315,6 +315,45 @@ def perform_addition():
         if len(binary1) == 0 or len(binary2) == 0 or len(entry_exponent1.get()) == 0 or len(entry_exponent2.get()) == 0 or len(entry_num_digits.get()) == 0:
             text_output.insert(tk.END, "Error: Please input both binary numbers and exponents.")
             return
+        
+        for char in binary1:
+            if char not in '01.-':
+                text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+                return
+        for char in binary2:
+            if char not in '01.-':
+                text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+                return
+
+
+        if num_digits > 24 or num_digits < 1:
+            text_output.insert(tk.END, "Error: Number of digits must be between 1 and 24.")
+            return
+        
+        if binary1.count('.') == 0:
+            binary1 += '.0'
+        if binary2.count('.') == 0:
+            binary2 += '.0'
+        
+        if binary1.count('-') > 1:
+            print("binary1", binary1)
+            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            return
+        if binary2.count('-') > 1:
+            print("binary2", binary2)
+            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            return
+        
+        if binary1.find('-') != 0 and binary1.find('-') != -1:
+            print(binary1.find('-'))
+            print("binary1-", binary1)
+            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            return
+        if binary2.find('-') != 0 and binary2.find('-') != -1:
+            print("binary2-", binary2)
+            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            return
+
 
         # Normalize input values
         if '.' not in binary1:
