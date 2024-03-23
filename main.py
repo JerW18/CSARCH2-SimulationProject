@@ -516,9 +516,9 @@ Final Answer:
 
 """)
     if not passed:
-        print("Test #" + str(test_num) + ": \u274C Failed!")
+        print("Test #" + str(test_num) + ": Failed!")
     else:
-        print("Test #" + str(test_num) + ": \u2705 Passed!")
+        print("Test #" + str(test_num) + ": Passed!")
 
     entry_binary1.delete(0, tk.END)
     entry_binary2.delete(0, tk.END)
@@ -583,9 +583,9 @@ def test_validation(test_num,
     error_message = error_message + "\n"
     passed = (res == error_message)
     if not passed:
-        print("Test #V" + str(test_num) + ": \u274C Failed!")
+        print("Test #V" + str(test_num) + ": Failed!")
     else:
-        print("Test #V" + str(test_num) + ": \u2705 Passed!")
+        print("Test #V" + str(test_num) + ": Passed!")
     entry_binary1.delete(0, tk.END)
     entry_binary2.delete(0, tk.END)
     entry_exponent1.delete(0, tk.END)
