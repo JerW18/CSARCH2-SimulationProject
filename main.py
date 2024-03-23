@@ -8,10 +8,8 @@ def float_to_binary(float_num, precision):
     integer_part = int(float_num)
     fractional_part = float_num - integer_part
 
-    # Convert integer part to binary
     binary_integer = bin(integer_part).replace("0b", "")
 
-    # Convert fractional part to binary
     binary_fractional = ""
     while fractional_part > 0 and len(binary_fractional) < precision:
         fractional_part *= 2
@@ -38,11 +36,9 @@ def move_decimal_point(binary_str, shift):
     shifted_fractional = ''
     
     if '1' not in integer_part and '1' in fractional_part:
-        #shift fractional part to the left
         if shift < 0 and fractional_part[0] != '1':
             shifted_integer = '0'
             shifted_fractional = fractional_part[1:] 
-            # print("shifted_fractional", shifted_fractional)
             return shifted_integer + '.' + shifted_fractional
         elif shift < 0 and fractional_part[0] == '1':
             shifted_integer = '1'
@@ -52,18 +48,15 @@ def move_decimal_point(binary_str, shift):
 
     # Shift the decimal point to the right
     if shift < 0:
-        # Pad with zeros if the fractional part is shorter than the shift
         if len(fractional_part) < abs(shift):
             shifted_integer += integer_part + fractional_part
             shifted_integer += '0' * (abs(shift) - len(fractional_part))
             shifted_fractional = fractional_part[abs(shift):]
             
-        # Normal shift
         elif len(fractional_part) >= abs(shift):
             shifted_integer = integer_part + fractional_part[:abs(shift)]
             shifted_fractional = fractional_part[abs(shift):]
             
-        # If the shifted fractional part is empty make it 0
         if len(shifted_fractional) == 0:
             shifted_fractional = '0'
         if len(shifted_integer) == 0:
@@ -74,17 +67,14 @@ def move_decimal_point(binary_str, shift):
     # Shift the decimal point to the left    
     elif shift >= 0:
         if '-' not in integer_part:
-            # Pad with zeros if the integer part is shorter than the shift
             if len(integer_part) < abs(shift):
                 shifted_fractional = '0' * (abs(shift) - len(integer_part)) + integer_part + fractional_part
                 shifted_integer = '0'
                 
-            # Normal shift
             elif len(integer_part) >= abs(shift):
                 shifted_fractional = integer_part[-abs(shift):] + fractional_part
                 shifted_integer = integer_part[:-abs(shift)]
 
-            # If the shifted integer part is empty make it 0
             if len(shifted_integer) == 0:
                 shifted_integer = '0'
                 
@@ -94,17 +84,14 @@ def move_decimal_point(binary_str, shift):
             negative = integer_part[:1]
             integer_part = integer_part[1:]
             
-            # Pad with zeros if the integer part is shorter than the shift
             if len(integer_part) < abs(shift):
                 shifted_fractional = '0' * (abs(shift) - len(integer_part)) + integer_part + fractional_part
                 shifted_integer = '0'
                 
-            # Normal shift
             elif len(integer_part) >= abs(shift):
                 shifted_fractional = integer_part[-abs(shift):] + fractional_part
                 shifted_integer = integer_part[:-abs(shift)]
 
-            # If the shifted integer part is empty make it 0
             if len(shifted_integer) == 0:
                 shifted_integer = '0'
             
@@ -112,7 +99,6 @@ def move_decimal_point(binary_str, shift):
 
 # Add Two Binary Numbers
 def add_binary_numbers(binary_num1, binary_num2):
-    # Split the numbers into integer and fractional parts
     int_part1, frac_part1 = binary_num1.split('.')
     int_part2, frac_part2 = binary_num2.split('.')
     int_neg1 = False
@@ -126,11 +112,9 @@ def add_binary_numbers(binary_num1, binary_num2):
         int_neg2 = True
         int_part2 = int_part2[1:]
     
-    # Convert the integer parts to decimal
     dec_num1 = Decimal(int(int_part1, 2))
     dec_num2 = Decimal(int(int_part2, 2))
     
-    # Convert the fractional parts to decimal
     frac_num1 = Decimal(int(frac_part1, 2)) / Decimal(2 ** len(frac_part1))
     frac_num2 = Decimal(int(frac_part2, 2)) / Decimal(2 ** len(frac_part2)) 
     
@@ -143,8 +127,7 @@ def add_binary_numbers(binary_num1, binary_num2):
         num2 = -num2
     
     sum_dec = num1 + num2
-    
-    # Convert the sum of fractional parts to binary
+
     sum_binary = float_to_binary(sum_dec, precision=len(frac_part1))
     
     return sum_binary
@@ -187,9 +170,6 @@ def grs_rounding(binary_str, num_bits):
     integer_part, fractional_part = binary_str.split('.')
     
     num_bits = num_bits + 1
-    #truncate to num_bits -1
-    #if remaining bits has 1, append 1 to the last bit
-    #else, append 0
     if len(fractional_part) > num_bits:
         round_bits = fractional_part[:num_bits]
         extra_bits = fractional_part[num_bits:]
@@ -217,7 +197,6 @@ def normalize_binary(binary_str, exponent):
         integer_part = integer_part[1:]
         negative = '-'
     
-    # Shift the decimal point to the right until the first '1' is encountered in the integer part
 
     if integer_part == '0' and fractional_part == '1':
         return '1.0', exponent - 1
@@ -266,9 +245,16 @@ def save_output():
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred while saving the file: {e}")
 
-# Perform Addition
+
 def perform_addition():
     try:
+        text_output.delete(1.0, tk.END)
+
+        #checking null inputs
+        if len(entry_binary1.get()) == 0 or len(entry_exponent1.get()) == 0 or len(entry_binary2.get()) == 0 or len(entry_exponent2.get()) == 0 or len(entry_num_digits.get()) == 0:
+            text_output.insert(tk.END, "Error: Please fill in all input fields.")
+            return
+
         binary1 = entry_binary1.get()
         exponent1 = int(entry_exponent1.get())
         binary2 = entry_binary2.get()
@@ -276,10 +262,8 @@ def perform_addition():
         rounding_mode = var_rounding_mode.get()
         num_digits = int(entry_num_digits.get())
 
-        # Clear previous text from the output Text widget
-        text_output.delete(1.0, tk.END)
 
-        # Check input validity
+        #check input validity
         if binary1.count('.') > 1 or binary2.count('.') > 1:
             text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
             return
@@ -296,15 +280,9 @@ def perform_addition():
                 text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
                 return
 
-
         if num_digits > 24 or num_digits < 1:
             text_output.insert(tk.END, "Error: Number of digits must be between 1 and 24.")
             return
-        
-        if binary1.count('.') == 0:
-            binary1 += '.0'
-        if binary2.count('.') == 0:
-            binary2 += '.0'
         
         if binary1.count('-') > 1:
             print("binary1", binary1)
@@ -324,15 +302,13 @@ def perform_addition():
             print("binary2-", binary2)
             text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
             return
-
-
-        # Normalize input values
+        
+        #normalizing
         if '.' not in binary1:
             binary1 += '.0'
         if '.' not in binary2:
             binary2 += '.0'
         
-        # Shift the decimal point to make it n.f
         normalize_binary1, exponent1 = normalize_binary(binary1, exponent1)
         normalize_binary2, exponent2 = normalize_binary(binary2, exponent2)
 
@@ -340,7 +316,7 @@ def perform_addition():
         text_output.insert(tk.END, f"Binary 1: [{normalize_binary1}] x 2^{exponent1}\n")
         text_output.insert(tk.END, f"Binary 2: [{normalize_binary2}] x 2^{exponent2}\n\n")
 
-        # Normalize the binary numbers to the larger exponent
+        #normalizing the binary numbers to the larger exponent
         if exponent1 > exponent2:
             normalize_binary2 = move_decimal_point(normalize_binary2, exponent1 - exponent2)
             exponent2 = exponent1
@@ -349,12 +325,11 @@ def perform_addition():
             exponent1 = exponent2
         result_exponent = max(exponent1, exponent2)
 
-        # Display normalized binary numbers
         text_output.insert(tk.END, "Same Exponent Binary Numbers:\n")
         text_output.insert(tk.END, f"Binary 1: [{normalize_binary1}] x 2^{exponent1}\n")
         text_output.insert(tk.END, f"Binary 2: [{normalize_binary2}] x 2^{exponent2}\n\n")
 
-        # Perform rounding based on selected rounding mode
+        #rounding
         if rounding_mode == "RTNE":
             round_binary1 = rtne_rounding(normalize_binary1, num_digits)
             round_binary2 = rtne_rounding(normalize_binary2, num_digits)
@@ -362,12 +337,11 @@ def perform_addition():
             round_binary1 = grs_rounding(normalize_binary1, num_digits)
             round_binary2 = grs_rounding(normalize_binary2, num_digits)
 
-        # Display rounded binary numbers
         text_output.insert(tk.END, "Rounded Binary Numbers:\n")
         text_output.insert(tk.END, f"Binary 1: [{round_binary1}] x 2^{exponent1}\n")
         text_output.insert(tk.END, f"Binary 2: [{round_binary2}] x 2^{exponent2}\n")
 
-        # Perform addition
+        #adding the binary numbers
         if '.' not in round_binary1:
             round_binary1 += '.0'
         if '.' not in round_binary2:
@@ -384,31 +358,29 @@ def perform_addition():
                 result_binary += '0' * (len(fractional_part_round) - len(fractional_part_result))
         text_output.insert(tk.END, f"     Sum: [{result_binary}] x 2^{result_exponent}\n\n")
 
-        # Normalize the result
-        
-        
+        #normalizing answer
+        if '.' not in result_binary:
+            result_binary += '.0'
         result_binary, result_exponent = normalize_binary(result_binary, result_exponent)
         result_binary = rtne_rounding(result_binary, num_digits) 
 
-        result_integer, result_fractional = result_binary.split('.')
-        if '1' not in result_integer and '1' not in result_fractional:
-            result_exponent = 0
+        if num_digits > 1:
+            result_integer, result_fractional = result_binary.split('.')
+            if '1' not in result_integer and '1' not in result_fractional:
+                result_exponent = 0
 
-        # Display final result
         text_output.insert(tk.END, "Final Answer:\n")
         text_output.insert(tk.END, f"[{result_binary}] x 2^{result_exponent}\n")
-
-        #save_output(text_output.get(1.0, tk.END))
 
     except Exception as e:
         text_output.insert(tk.END, f"Error: An error occurred: {e}")
 
 
-# GUI setup
+#GUI
 root = tk.Tk()
 root.title("Binary Addition")
 
-# Operand 1 inputs
+#binary 1
 label_binary1 = tk.Label(root, text="Input First Binary:")
 label_binary1.grid(row=0, column=0, padx=5, pady=5)
 entry_binary1 = tk.Entry(root)
@@ -419,7 +391,7 @@ label_exponent1.grid(row=1, column=0, padx=5, pady=5)
 entry_exponent1 = tk.Entry(root)
 entry_exponent1.grid(row=1, column=1, padx=5, pady=5)
 
-# Operand 2 inputs
+#binary 2
 label_binary2 = tk.Label(root, text="Input Second Binary:")
 label_binary2.grid(row=2, column=0, padx=5, pady=5)
 entry_binary2 = tk.Entry(root)
@@ -430,26 +402,24 @@ label_exponent2.grid(row=3, column=0, padx=5, pady=5)
 entry_exponent2 = tk.Entry(root)
 entry_exponent2.grid(row=3, column=1, padx=5, pady=5)
 
-# Rounding mode selection
+#rounding mode selection
 label_rounding_mode = tk.Label(root, text="Rounding Mode:")
 label_rounding_mode.grid(row=4, column=0, padx=5, pady=5)
-var_rounding_mode = tk.StringVar(value="GRS")  # Default to GRS rounding
+var_rounding_mode = tk.StringVar(value="GRS")
 radio_grs = tk.Radiobutton(root, text="GRS (Guard, Round, Sticky)", variable=var_rounding_mode, value="GRS")
 radio_grs.grid(row=4, column=1, padx=5, pady=5)
 radio_rtne = tk.Radiobutton(root, text="RTNE (Round to Nearest Even)", variable=var_rounding_mode, value="RTNE")
 radio_rtne.grid(row=5, column=1, padx=5, pady=5)
 
-# Number of digits supported
+#number of digits
 label_num_digits = tk.Label(root, text="Number of Digits Supported:")
 label_num_digits.grid(row=6, column=0, padx=5, pady=5)
 entry_num_digits = tk.Entry(root)
 entry_num_digits.grid(row=6, column=1, padx=5, pady=5)
 
-# Perform addition button
 button_add = tk.Button(root, text="Perform Addition", command=perform_addition)
 button_add.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
 
-# Output Text widget
 text_output = tk.Text(root, width=50, height=17)
 text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
 
