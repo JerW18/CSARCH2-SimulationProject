@@ -19,7 +19,7 @@ This Python project implements IEEE-754 binary-32 floating point arithmetic oper
 2. Open the file IEEE_754_Binary_32_operation.py
 3. Compile and run the Python file (IEEE_754_Binary_32_operation.py)
 ### Running the .exe
-1. Download main.exe
+1. Download IEEE_754_Binary_32_operation.exe
 2. Double click and run it (may take a moment to load)
 Note: The automated tests will also run and be shown on the CLI.
 
@@ -42,12 +42,9 @@ These cases show adding with a positive and a negative input, again with GRS on 
 
 | With GRS | Without GRS |
 | ---------| ------------|
-|1st Input is positive, 2nd Input is negative.|
-
+|1st Input is positive, 2nd Input is negative.| |
 | <img src="tests/1Positive1Negative_GRS.png" alt="1Positive1Negative_GRS" width="250"/> | <img src="tests/1Positive1Negative_NGRS.png" alt="1Positive1Negative_NGRS" width="250"/> |
-
-|And now reversed, the 1st Input is negative while the 2nd is positive.|
-
+|1st Input is negative, while the 2nd is positive.| |
 | <img src="tests/1Negative1Positive_GRS.png" alt="1Negative1Positive_GRS" width="250"/> | <img src="tests/1Negative1Positive_NGRS.png" alt="1Negative1Positive_NGRS" width="250"/> |
 
 ### Both Negative
