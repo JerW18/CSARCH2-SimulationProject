@@ -140,6 +140,11 @@ def add_binary_numbers(binary_num1, binary_num2):
 
 # Round to the Nearest Even (RTNTE) Rounding
 def rtnte_rounding(binary_str, num_bits):
+    is_negative = False
+    if binary_str[0] == '-':
+        binary_str = binary_str[1:]
+        is_negative = True
+
     integer_part, fractional_part = binary_str.split('.')
     
     if num_bits == 1:
@@ -160,6 +165,9 @@ def rtnte_rounding(binary_str, num_bits):
             
         else:
             binary_str = integer_part + '.' + round_bits
+
+    if is_negative:
+        binary_str = '-' + binary_str
 
     if '.' not in binary_str:
             binary_str += '.0'
@@ -202,18 +210,17 @@ def normalize_binary(binary_str, exponent):
     if '-' in integer_part:
         integer_part = integer_part[1:]
         negative = '-'
-    
 
-    if integer_part == '0' and fractional_part == '1':
-        return '1.0', exponent - 1
-    if integer_part == '0' and fractional_part == '0':
-        return '0.0', 0
+    one_pos = integer_part.find('1')
+    if(one_pos != -1):
+        integer_part = integer_part[one_pos:]
+        binary_str = integer_part + '.' + fractional_part
+    integer_part, fractional_part = binary_str.split('.')
     
     while '1' not in integer_part and '1' in fractional_part:
         exponent -= 1
         binary_str = integer_part + '.' + fractional_part
         binary_str = move_decimal_point(binary_str, -1)
-        print("cc", binary_str)
         integer_part, fractional_part = binary_str.split('.')
 
     #while number of 1's in integer part is greater than 1, shift
@@ -300,25 +307,25 @@ def perform_addition():
             return
         
         if binary1.count('-') > 1:
-            print("binary1", binary1)
             text_output.insert(tk.END, "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
             return
         if binary2.count('-') > 1:
-            print("binary2", binary2)
             text_output.insert(tk.END, "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
             return
         
         if binary1.find('-') != 0 and binary1.find('-') != -1:
-            print(binary1.find('-'))
-            print("binary1-", binary1)
             text_output.insert(tk.END, "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
             return
         if binary2.find('-') != 0 and binary2.find('-') != -1:
-            print("binary2-", binary2)
             text_output.insert(tk.END, "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
             return
         
-        
+        if(exponent1 < -126 or exponent1 > 127):
+            text_output.insert(tk.END, "Error: Exponent 1 must be between -126 and 127.")
+            return
+        if(exponent2 < -126 or exponent2 > 127):
+            text_output.insert(tk.END, "Error: Exponent 2 must be between -126 and 127.")
+            return
         
         #normalizing
         if '.' not in binary1:
@@ -379,7 +386,6 @@ def perform_addition():
             result_binary += '0' * (len(fractional_part_round) - len(fractional_part_result))
         if length1 == 0:
             result_binary = integer_part_result
-        print( len(fractional_part_round))
         text_output.insert(tk.END, f"     Sum: [{result_binary}] x 2^{result_exponent}\n\n")
 
         #normalizing answer
@@ -450,36 +456,154 @@ text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
 button_save_output = tk.Button(root, text="Save Output", command=save_output)
 button_save_output.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
 
+
+def test(test_num,
+         entry_binary_input_1,
+         entry_exponent_input_1,
+         entry_binary_input_2,
+         entry_exponent_input_2,
+         var_rounding_mode_input,
+         entry_num_digits_input,
+         normal_binary_1,
+         normal_expo_1,
+         normal_binary_2,
+         normal_expo_2,
+         same_binary_1,
+         same_expo_1,
+         same_binary_2,
+         same_expo_2,
+         round_binary_1,
+         round_expo_1,
+         round_binary_2,
+         round_expo_2,
+         sum_binary,
+         sum_expo,
+         final_binary,
+         final_expo):
+    entry_binary1.delete(0, tk.END)
+    entry_binary2.delete(0, tk.END)
+    entry_exponent1.delete(0, tk.END)
+    entry_exponent2.delete(0, tk.END)
+    entry_num_digits.delete(0, tk.END)
+    entry_binary1.insert(0, entry_binary_input_1)
+    entry_binary2.insert(0, entry_binary_input_2)
+    entry_exponent1.insert(0, entry_exponent_input_1)
+    entry_exponent2.insert(0, entry_exponent_input_2)
+    entry_num_digits.insert(0, entry_num_digits_input)
+    var_rounding_mode.set(var_rounding_mode_input)
+    perform_addition()
+    res = text_output.get(1.0, tk.END)
+    print("Test #" + str(test_num) + ": " + str(res == 
+        f"""Normalized Binary Numbers:
+Binary 1: [{normal_binary_1}] x 2^{normal_expo_1}
+Binary 2: [{normal_binary_2}] x 2^{normal_expo_2}
+
+Same Exponent Binary Numbers:
+Binary 1: [{same_binary_1}] x 2^{same_expo_1}
+Binary 2: [{same_binary_2}] x 2^{same_expo_2}
+
+Rounded Binary Numbers:
+Binary 1: [{round_binary_1}] x 2^{round_expo_1}
+Binary 2: [{round_binary_2}] x 2^{round_expo_2}
+-------------------------------------------------
+     Sum: [{sum_binary}] x 2^{sum_expo}
+
+Final Answer:
+[{final_binary}] x 2^{final_expo}
+
+"""))
+    entry_binary1.delete(0, tk.END)
+    entry_binary2.delete(0, tk.END)
+    entry_exponent1.delete(0, tk.END)
+    entry_exponent2.delete(0, tk.END)
+    entry_num_digits.delete(0, tk.END)
+    #text_output.delete(1.0, tk.END)
+
+test(1, "-1.0", "3", "1.0", "3", "GRS", "3", "-1.0", "3", "1.0", "3", "-1.0", "3", "1.0", "3", "-1.00000", "3", "1.00000", "3", "0.00000", "3", "0.00", "0")
+test(2, "1.0", "3", "-1.0", "3", "GRS", "3", "1.0", "3", "-1.0", "3", "1.0", "3", "-1.0", "3", "1.00000", "3", "-1.00000", "3", "0.00000", "3", "0.00", "0")
+test(3, "-1.0", "3", "-1.0", "3", "GRS", "3", "-1.0", "3", "-1.0", "3", "-1.0", "3", "-1.0", "3", "-1.00000", "3", "-1.00000", "3", "-10.00000", "3", "-1.00", "4")
+test(4, "1.0", "3", "1.0", "3", "GRS", "3", "1.0", "3", "1.0", "3", "1.0", "3", "1.0", "3", "1.00000", "3", "1.00000", "3", "10.00000", "3", "1.00", "4")
+test(5, "100.1110111001001", "5", "0.01101111101010001", "7", "RTNTE", "10", "1.001110111001001", "7", "1.101111101010001", "5", "1.001110111001001", "7", "0.01101111101010001", "7", "1.001110111", "7", "0.011011111", "7", "1.101010110", "7", "1.101010110", "7")
+test(6, "1.0111110010011", "5", "1.00111111100011", "3", "GRS", "9", "1.0111110010011", "5", "1.00111111100011", "3", "1.0111110010011", "5", "0.0100111111100011", "5", "1.01111100101", "5", "0.01001111111", "5", "1.11001100100", "5", "1.11001100", "5")
+test(7, "1.0111110010011", "5", "1.00111111100011", "3", "RTNTE", "9", "1.0111110010011", "5", "1.00111111100011", "3", "1.0111110010011", "5", "0.0100111111100011", "5", "1.01111101", "5", "0.01010000", "5", "1.11001101", "5", "1.11001101", "5")
+test(8, "100.1110111001001", "5",     "0.0110111110101", "7",     "GRS", "8",      "1.001110111001001", "7",      "1.10111110101", "5",      "1.001110111001001", "7",      "0.0110111110101", "7",      "1.0011101111", "7",      "0.0110111111", "7",      "1.1010101110", "7",      "1.1010110", "7")
+test(9, "1.0111110010", "5",     "1.0011111110", "3",     "RTNTE", "7",      "1.0111110010", "5",      "1.0011111110", "3",      "1.0111110010", "5",      "0.010011111110", "5",      "1.011111", "5",      "0.010100", "5",      "1.110011", "5",      "1.110011", "5")
+test(10, "100.1110111001001", "5",     "0.0110111110101", "7",     "GRS", "8",      "1.001110111001001", "7",      "1.10111110101", "5",      "1.001110111001001", "7",      "0.0110111110101", "7",      "1.0011101111", "7",      "0.0110111111", "7",      "1.1010101110", "7",      "1.1010110", "7")
+test(11, "1.011111001", "5",     "1.0011111110", "3",     "RTNTE", "7",      "1.011111001", "5",      "1.0011111110", "3",      "1.011111001", "5",      "0.010011111110", "5",      "1.011111", "5",      "0.010100", "5",      "1.110011", "5",      "1.110011", "5")
+test(12, "100.1110111001001", "5",     "-0.01101111101010001", "7",     "RTNTE", "10",      "1.001110111001001", "7",      "-1.101111101010001", "5",      "1.001110111001001", "7",      "-0.01101111101010001", "7",      "1.001110111", "7",      "-0.011011111", "7",    "0.110011000", "7",     "1.100110000", "6")
+test(13, "100.1110111001001", "5",     "-0.01101111101010001", "7",     "GRS", "10",      "1.001110111001001", "7",      "-1.101111101010001", "5",      "1.001110111001001", "7",      "-0.01101111101010001", "7",      "1.001110111001", "7",      "-0.011011111011", "7",    "0.110010111110", "7",     "1.100110000", "6")
+test(14, "1.0010", "3",     "-1.0001", "3",     "GRS", "3",      "1.0010", "3",      "-1.0001", "3",      "1.0010", "3",      "-1.0001", "3",      "1.00100", "3",      "-1.00010", "3",    "0.00010", "3",     "1.00", "-1")
+test(15, "100.1110111001001", "5",     "0.01101111101010001", "7",     "GRS", "7",      "1.001110111001001", "7",      "1.101111101010001", "5",      "1.001110111001001", "7",      "0.01101111101010001", "7",      "1.001110111", "7",      "0.011011111", "7",    "1.101010110", "7",     "1.101011", "7")
+test(16, "1.1111110010", "6", "1.1111100011", "4", "GRS", "5", "1.1111110010", "6", "1.1111100011", "4", "1.1111110010", "6", "0.011111100011", "6", "1.1111111", "6", "0.0111111", "6", "10.0111110", "6", "1.0100", "7")
+test(17, "-1.1010", "-2", "-0.101", '-4', "RTNTE", "3", "-1.1010", "-2", "-1.01", "-5", "-1.1010", "-2", "-0.00101", "-2", "-1.10", "-2", "-0.01", "-2", "-1.11", "-2", "-1.11", "-2")
+test(18, "-1.1010", "-2", "-0.101", '-4', "GRS", "3", "-1.1010", "-2", "-1.01", "-5", "-1.1010", "-2", "-0.00101", "-2", "-1.10100", "-2", "-0.00101", "-2", "-1.11001", "-2", "-1.11", "-2")
+test(19, "-100.1110111001001", "5",     "0.01101111101010001", "7",     "GRS", "10",      "-1.001110111001001", "7",      "1.101111101010001", "5",      "-1.001110111001001", "7",      "0.01101111101010001", "7",      "-1.001110111001", "7",      "0.011011111011", "7",    "-0.110010111110", "7",     "-1.100110000", "6")
+test(20, "-1.011111001", "5",     "-1.0011111110", "3",     "RTNTE", "7",      "-1.011111001", "5",      "-1.0011111110", "3",      "-1.011111001", "5",      "-0.010011111110", "5",      "-1.011111", "5",      "-0.010100", "5",      "-1.110011", "5",      "-1.110011", "5")
+test(21, "1", "0", "1", "0", "RTNTE", "2", "1.0", "0", "1.0", "0", "1.0", "0", "1.0", "0", "1.0", "0", "1.0", "0", "10.0", "0", "1.0", "1")
+test(22, "1", "-3", "1", "-3", "RTNTE", "2", "1.0", "-3", "1.0", "-3", "1.0", "-3", "1.0", "-3", "1.0", "-3", "1.0", "-3", "10.0", "-3", "1.0", "-2")
+test(23, "0", "-3", "0", "-3", "RTNTE", "2", "0.0", "-3", "0.0", "-3", "0.0", "-3", "0.0", "-3", "0.0", "-3", "0.0", "-3", "0.0", "-3", "0.0", "0")
+test(24, "00.0", "-3", "00.0", "-3", "RTNTE", "2", "0.00", "-2", "0.00", "-2", "0.00", "-2", "0.00", "-2", "0.0", "-2", "0.0", "-2", "0.0", "-2", "0.0", "0")
+test(25, "0.1", "0", "0.1", "0", "RTNTE", "2", "1.0", "-1", "1.0", "-1", "1.0", "-1", "1.0", "-1", "1.0", "-1", "1.0", "-1", "10.0", "-1", "1.0", "0",)
+test(26, "001.1", "5", "0.000000001", "5", "GRS", "3", "1.1", "5", "1.0", '-4', "1.1", "5", "0.0000000010", "5", "1.10000", "5", "0.00001", "5", "1.10001", "5", "1.10", "5")
+test(27, "1100.10", "-4", "0.110010", "5", "GRS", "4", "1.10010", "-1", "1.10010", '4', "0.0000110010", "4", "1.10010", '4', "0.000011", "4", "1.100100", '4', "1.100111", "4", "1.101", "4")
+
+
+def test_validation(test_num,
+         entry_binary_input_1,
+         entry_exponent_input_1,
+         entry_binary_input_2,
+         entry_exponent_input_2,
+         var_rounding_mode_input,
+         entry_num_digits_input,
+         error_message):
+    entry_binary1.delete(0, tk.END)
+    entry_binary2.delete(0, tk.END)
+    entry_exponent1.delete(0, tk.END)
+    entry_exponent2.delete(0, tk.END)
+    entry_num_digits.delete(0, tk.END)
+    entry_binary1.insert(0, entry_binary_input_1)
+    entry_binary2.insert(0, entry_binary_input_2)
+    entry_exponent1.insert(0, entry_exponent_input_1)
+    entry_exponent2.insert(0, entry_exponent_input_2)
+    entry_num_digits.insert(0, entry_num_digits_input)
+    var_rounding_mode.set(var_rounding_mode_input)
+    perform_addition()
+    res = text_output.get(1.0, tk.END)
+    error_message = error_message + "\n"
+    print("Test #V" + str(test_num) + ": " + str(res == error_message))
+    entry_binary1.delete(0, tk.END)
+    entry_binary2.delete(0, tk.END)
+    entry_exponent1.delete(0, tk.END)
+    entry_exponent2.delete(0, tk.END)
+    entry_num_digits.delete(0, tk.END)
+    # text_output.delete(1.0, tk.END)
+
+print()
+# Disallow empty inputs for all fields.
+test_validation(1, "", "", "", "", "GRS", "", "Error: Please fill in all input fields.")
+# Disallow non-binary inputs for binary numbers.
+test_validation(2, "2", "3", "1", "3", "GRS", "3", "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
+test_validation(3, "jsdfo", "3", "1", "3", "GRS", "3", "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
+test_validation(4, "1", "3", "sdfb", "3", "GRS", "3", "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
+# Disallow non-integer inputs for exponents.
+test_validation(5, "1", "1.1", "1", "3", "GRS", "3", "Error: Incorrect input format for exponent 1. \nPlease input numericals only.")
+test_validation(5, "1", "abds", "1", "3", "GRS", "3", "Error: Incorrect input format for exponent 1. \nPlease input numericals only.")
+test_validation(5, "1", "3", "1", "1.1", "GRS", "3", "Error: Incorrect input format for exponent 2. \nPlease input numericals only.")
+test_validation(5, "1", "3", "1", "abds", "GRS", "3", "Error: Incorrect input format for exponent 2. \nPlease input numericals only.")
+# Disallow negative signs not at the start.
+test_validation(6, "1-", "3", "1", "3", "GRS", "3", "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
+test_validation(7, "1", "3", "1-", "3", "GRS", "3", "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
+# Disallow multiple negative signs.
+test_validation(8, "--1", "3", "1", "3", "GRS", "3", "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
+test_validation(9, "1", "3", "--1", "3", "GRS", "3", "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
+# Disallow multiple binary points.
+test_validation(10, "1.1.1", "3", "1", "3", "GRS", "3", "Error: Incorrect input format. \nPlease input binary numbers.")
+test_validation(11, "1", "3", "1.1.1", "3", "GRS", "3", "Error: Incorrect input format. \nPlease input binary numbers.")
+# Disallow greater than 24 for number of digits supported.
+test_validation(12, "1", "3", "1", "3", "GRS", "25", "Error: Number of digits must be between 1 and 24.")
+# Disallow exponent greater than 127.
+test_validation(13, "1", "128", "1", "3", "GRS", "3", "Error: Exponent 1 must be between -126 and 127.")
+# Disallow exponent below -126.
+test_validation(14, "1", "-127", "1", "3", "GRS", "3", "Error: Exponent 1 must be between -126 and 127.")
+
 root.mainloop()
-
-print(move_decimal_point('101.101', 0))
-
-# Tests for functions...
-print()
-print("Test for move_decimal_point")
-print("1. " + move_decimal_point('101.101', -4) + " == 1011010.0 is " + str(move_decimal_point('101.101', -4) == '1011010.0'))
-print("2. " + move_decimal_point('101.101', -3) + " == 101101.0 is " + str(move_decimal_point('101.101', -3) == '101101.0'))
-print("3. " + move_decimal_point('101.101', -2) + " == 10110.1 is " + str(move_decimal_point('101.101', -2) == '10110.1'))
-print("4. " + move_decimal_point('101.101', -1) + " == 1011.01 is " + str(move_decimal_point('101.101', -1) == '1011.01'))
-print("5. " + move_decimal_point('101.101', 0) + " == 101.101 is " + str(move_decimal_point('101.101', 0) == '101.101'))
-print("6. " + move_decimal_point('101.101', 1) + " == 10.1101 is " + str(move_decimal_point('101.101', 1) == '10.1101'))
-print("7. " + move_decimal_point('101.101', 2) + " == 1.01101 is " + str(move_decimal_point('101.101', 2) == '1.01101'))
-print("8. " + move_decimal_point('101.101', 3) + " == 0.101101 is " + str(move_decimal_point('101.101', 3) == '0.101101'))
-print("9. " + move_decimal_point('101.101', 4) + " == 0.0101101 is " + str(move_decimal_point('101.101', 4) == '0.0101101'))
-print("10. " + move_decimal_point('0.0101', -4) + " == 101.0 is " + str(move_decimal_point('0.0101', -4) == '101.0'))
-print("11. " + move_decimal_point('0.0101', -3) + " == 10.1 is " + str(move_decimal_point('0.0101', -3) == '10.1'))
-print("12. " + move_decimal_point('0.0101', -2) + " == 1.01 is " + str(move_decimal_point('0.0101', -2) == '1.01'))
-print("13. " + move_decimal_point('0.0101', -1) + " == 0.101 is " + str(move_decimal_point('0.0101', -1) == '0.101'))
-print("14. " + move_decimal_point('0.0101', 0) + " == 0.0101 is " + str(move_decimal_point('0.0101', 0) == '0.0101'))
-print("15. " + move_decimal_point('0.0101', 1) + " == 0.00101 is " + str(move_decimal_point('0.0101', 1) == '0.00101'))
-print("16. " + move_decimal_point('0.0101', 2) + " == 0.000101 is " + str(move_decimal_point('0.0101', 2) == '0.000101'))
-print("17. " + move_decimal_point('0.0101', 3) + " == 0.0000101 is " + str(move_decimal_point('0.0101', 3) == '0.0000101'))
-print("18. " + move_decimal_point('0.0101', 4) + " == 0.00000101 is " + str(move_decimal_point('0.0101', 4) == '0.00000101'))
-
-print()
-print("Test for add_binary_numbers")
-print("1. " + add_binary_numbers('101.101', '110.011') + " == 1100.000 is " + str(add_binary_numbers('101.101', '110.011') == '1100.000'))
-print("2. " + add_binary_numbers('0.101', '0.011') + " == 1.000 is " + str(add_binary_numbers('0.101', '0.011') == '1.000'))
-print("3. " + add_binary_numbers('101.101', '0.011') + " == 101.000 is " + str(add_binary_numbers('101.101', '0.011') == '101.000'))
-
-
