@@ -517,7 +517,7 @@ Final Answer:
     entry_exponent1.delete(0, tk.END)
     entry_exponent2.delete(0, tk.END)
     entry_num_digits.delete(0, tk.END)
-    #text_output.delete(1.0, tk.END)
+    text_output.delete(1.0, tk.END)
 
 test(1, "-1.0", "3", "1.0", "3", "GRS", "3", "-1.0", "3", "1.0", "3", "-1.0", "3", "1.0", "3", "-1.00000", "3", "1.00000", "3", "0.00000", "3", "0.00", "0")
 test(2, "1.0", "3", "-1.0", "3", "GRS", "3", "1.0", "3", "-1.0", "3", "1.0", "3", "-1.0", "3", "1.00000", "3", "-1.00000", "3", "0.00000", "3", "0.00", "0")
@@ -576,7 +576,7 @@ def test_validation(test_num,
     entry_exponent1.delete(0, tk.END)
     entry_exponent2.delete(0, tk.END)
     entry_num_digits.delete(0, tk.END)
-    # text_output.delete(1.0, tk.END)
+    text_output.delete(1.0, tk.END)
 
 print()
 # Disallow empty inputs for all fields.
