@@ -13,6 +13,13 @@ This Python project implements IEEE-754 binary-32 floating point arithmetic oper
 - Step-by-step output displayed in the GUI
 - Option for file export as a .txt file
 
+## General Process of the Code
+- First, the code will normalize the binary number inputs to 1.f format.
+- Next, it will equalize the exponents to the higher exponent using a function that moves the decimal place given a shift value.
+- Then, depending on the chosen rounding mode (with or without GRS), it either adds GRS bits after the desired number of bits or uses RTN-TE to round to the desired number of bits.
+- Afterwards, it will perform the addition of the binary numbers.
+- Finally, the code will round the resulting binary number to the desired number of bits.
+
 ## Usage
 ### Running the code
 1. Download the GitHub files to your local machine.
@@ -20,13 +27,13 @@ This Python project implements IEEE-754 binary-32 floating point arithmetic oper
 3. Compile and run the Python file (IEEE_754_Binary_32_operation.py)
 ### Running the .exe
 1. Download IEEE_754_Binary_32_operation.exe
-2. Double click and run it (may take a moment to load)
+2. Double-click and run it (may take a moment to load)
 Note: The automated tests will also run and be shown on the CLI.
 
 ### GUI Input
 The program will ask the user for two floating point binary inputs and their exponents. 
 Following this they will be prompted to choose which rounding mode they would like to use.
-Then lastly they need to input the number of digits that is going to be used for the operation.
+Then lastly they need to input the number of digits that are going to be used for the operation.
 
 
 ## Test Cases and Sample Outputs
@@ -72,7 +79,7 @@ There are also several simple forms of input checking available in the program. 
 | <img src="tests/Error1.png" alt="Error1" width="250"/> | <img src="tests/Error2.png" alt="Error2" width="250"/> | <img src="tests/Error3.png" alt="Error3" width="250"/> |
 
 ### Output to .txt file
-Finally, the following images shows a sample of saving the output to a text file, then showing the file's contents to be the same as the content displayed in the GUI.
+Finally, the following images show a sample of saving the output to a text file, and then showing the file's contents to be the same as the content displayed in the GUI.
 
 | Outputting to text | | | |
 |------------------------|------------------------|------------------------|------------------------|
@@ -82,21 +89,21 @@ Finally, the following images shows a sample of saving the output to a text file
 
 
 ## Problems Encountered
-There were several problems that were encountered by the group while creating this simulation project. One was the time constraints due to requirements in other subjects, but as for the coding itself, there were issues particularly in creating and implementing the normalization, rounding, single digit support, and negative inputs (and consequently, subtraction). The last of the set was particularly troublesome because the entire project was initially implemented to *not* allow negative numbers.
+There were several problems that were encountered by the group while creating this simulation project. One was the time constraints due to requirements in other subjects, but as for the coding itself, there were issues particularly in creating and implementing the normalization, rounding, single-digit support, and negative inputs (and consequently, subtraction). The last of the set was particularly troublesome because the entire project was initially implemented to *not* allow negative numbers.
 ### Normalization
 Creating a correct and working normalization function is an important step in creating the project. The initial implementation correctly shifted cases such as `1.xxx, 1xxx.xxx, and so on` (where x is 0 or 1), based on a specific inputted shifting value. The issue came with denormalized binary cases like `0.1, 0.0001, 0.xxx1, and 00.0xxx1`. After investigating, it was found that the original implementation handled the 'integer' part and 'floating' part incorrectly, shifting the cases to values like `0000.1`. Given this, the code was changed to first check the two parts of the binary input - to see if the integer part had a '1', then slowly shift the binary point and exponent until it is properly normalized.  
 ### Rounding
-Implementing the Round to Nearest, Ties to Even was initially implemented incorrectly due to misremembering how RTNTE works. The solution was relatively straight forward - double-checking the slides and reviewing the methodology, and finally implementing it in code.
+Implementing the Round to Nearest, Ties to Even was initially implemented incorrectly due to misremembering how RTNTE works. The solution was relatively straightforward - double-checking the slides and reviewing the methodology, and finally implementing it in code.
 ### Single Digit Support
-Due to the odd nature of Python addition and binary splitting, the single digit support (ie, Digits Supported = 1) became a headache in the project. 
-- First is Python truncates excess 0's, ie adding `1.0 + 1.0` would return `10` instead of `10.0`, which technically is not wrong, but in terms of the scope of the project, it is indeed incorrect. Thus, to conform to the format discussed in class, the extra 0's had to be manually checked and added to the binary result. 
-- The second issue ties in with the first since the `.split(.)` function works only if the binary point is present in the value. This means that values like `10, 1, and 0` would cause errors. Guard clauses that would 'fix' the value to have a binary point were added, but another issue that came as a result was the final sum printing `0.0` instead of just `0` for single digit support cases. After some trial and error, the final solution was to just note the length (supported digits), then manually manipulate the resulting integer sum to be the correct format. 
+Due to the odd nature of Python addition and binary splitting, the single-digit support (ie, Digits Supported = 1) became a headache in the project. 
+- First, Python truncates excess 0's, ie adding `1.0 + 1.0` would return `10` instead of `10.0`, which technically is not wrong, but in terms of the scope of the project, it is indeed incorrect. Thus, to conform to the format discussed in class, the extra 0s had to be manually checked and added to the binary result. 
+- The second issue ties in with the first since the `.split(.)` function works only if the binary point is present in the value. This means that values like `10, 1, and 0` would cause errors. Guard clauses that would 'fix' the value to have a binary point were added, but another issue that came, as a result, was the final sum printing `0.0` instead of just `0` for single-digit support cases. After some trial and error, the final solution was to just note the length (supported digits), then manually manipulate the resulting integer sum to be the correct format. 
  - To be more specific, the earlier case of `0.0` (which is incorrect) would instead print `0` (correct) if only 1 digit is supported.
 ### Negative Inputs & Subtraction
-As stated earlier, the initial implementation did not account for negative binary numbers, as we thought that project primarily focused on addition. However, after realizing the need to handle negative inputs for a more comprehensive simulation, the code underwent significant revisions. Then, main challenge was adapting the existing codebase to accommodate negative binary numbers and perform subtraction operations. This involved reworking the normalization, rounding, and addition algorithms to handle negative inputs correctly. 
-The solution was really to just initially note whether or not the function parameter input (for functions for normalizing and rounding) was negative or not. After, a flag would be set, the negative sign would be cut, then the function would proceed as if the input value were positive. After, the negative sign would be added back to the value. The adding function was also revised to use Python's `Decimal`, while also adding the functionality for subtraction (again, occurs when at least one of the inputs is negative). 
+As stated earlier, the initial implementation did not account for negative binary numbers, as we thought that the project primarily focused on addition. However, after realizing the need to handle negative inputs for a more comprehensive simulation, the code underwent significant revisions. Then, the main challenge was adapting the existing codebase to accommodate negative binary numbers and perform subtraction operations. This involved reworking the normalization, rounding, and addition algorithms to handle negative inputs correctly. 
+The solution was really to just initially note whether or not the function parameter input (for functions for normalizing and rounding) was negative or not. After a flag would be set, the negative sign would be cut, then the function would proceed as if the input value were positive. After, the negative sign would be added back to the value. The adding function was also revised to use Python's `Decimal`, while also adding the functionality for subtraction (again, occurs when at least one of the inputs is negative). 
 ### Overall Checking
-This isn't actually a problem, but a solution we used to verify our output was creating 'automated tests' to verify that the bugs and incorrect outputs that were occuring were slowly being fixed. An issue that often occurs when coding is fixing a bug, only for another one to appear, hence the decision to make this automation. This idea primarily came from the STSWENG course that we are currently taking, and it really did make checking our project much easier, allowing us to find more edge cases (if any) and create a project that we are relatively satisfied with - output wise.
+This isn't actually a problem, but a solution we used to verify our output was creating 'automated tests' to verify that the bugs and incorrect outputs that were occurring were slowly being fixed. An issue that often occurs when coding is fixing a bug, only for another one to appear, hence the decision to make this automation. This idea primarily came from the STSWENG course that we are currently taking, and it really did make checking our project much easier, allowing us to find more edge cases (if any) and create a project that we are relatively satisfied with - output-wise.
 
 
 ## Authors
