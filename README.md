@@ -1,7 +1,7 @@
 
 # IEEE-754 Binary-32 floating-point operation
 ## Overview
-This Python project implements IEEE-754 binary-32 floating point arithmetic operations, specifically focusing on addition. The operation allows two rounding formats - with Guard, Round, Sticky (GRS) and without (GRS) which uses Round To Nearest, Ties to Even(RTN-TE) to round to the required number of bits for the operands. It has support for positive and negative binary values, a maximum of up to 24 digits, and exponent values ranging from -126 to 127. The step-by-step output is shown in normalized 1.f binary format, with an additional option to export said steps as a text file.
+This Python project implements IEEE-754 binary-32 floating point arithmetic operations, specifically focusing on addition. The operation allows two rounding formats - with Guard, Round, Sticky (GRS) and without (GRS) which uses Round To Nearest, Ties to Even (RTN-TE) to round to the required number of bits for the operands. It has support for positive and negative binary values, a maximum of up to 24 digits, and exponent values ranging from -126 to 127. The step-by-step output is shown in normalized 1.f binary format, with an additional option to export said steps as a text file.
 
 ## Features
 - Expected Input: Positive and Negative binary inputs
@@ -21,27 +21,68 @@ This Python project implements IEEE-754 binary-32 floating point arithmetic oper
 ### Running the .exe
 1. Download main.exe
 2. Double click and run it (may take a moment to load)
+Note: The automated tests will also run and be shown on the CLI.
 
 ### GUI Input
 The program will ask the user for two floating point binary inputs and their exponents. 
 Following this they will be prompted to choose which rounding mode they would like to use.
 Then lastly they need to input the number of digits that is going to be used for the operation.
 
-<img src="tests/Emoji.jpg" alt="test" width="200"/>
-<img src="tests/Emoji.jpg" alt="test" width="200"/>
 
 ## Test Cases and Sample Outputs
 ### Both Positive
-
 This test case shows two positive inputs, added with GRS on the left, and without GRS (hence, using RTNTE) on the right.
+
 | With GRS | Without GRS |
 | ---------| ------------|
-| <img src="tests/2Positive_GRS.png" alt="2Positive_GRS" width="300"/> | <img src="tests/2Positive_NGRS.png" alt="2Positive_NGRS" width="300"/> |
+| <img src="tests/2Positive_GRS.png" alt="2Positive_GRS" width="250"/> | <img src="tests/2Positive_NGRS.png" alt="2Positive_NGRS" width="250"/> |
 
 ### One Positive, One Negative
+These cases show adding with a positive and a negative input, again with GRS on the left, and without GRS on the right.
+
+| With GRS | Without GRS |
+| ---------| ------------|
+|1st Input is positive, 2nd Input is negative.|
+
+| <img src="tests/1Positive1Negative_GRS.png" alt="1Positive1Negative_GRS" width="250"/> | <img src="tests/1Positive1Negative_NGRS.png" alt="1Positive1Negative_NGRS" width="250"/> |
+
+|And now reversed, the 1st Input is negative while the 2nd is positive.|
+
+| <img src="tests/1Negative1Positive_GRS.png" alt="1Negative1Positive_GRS" width="250"/> | <img src="tests/1Negative1Positive_NGRS.png" alt="1Negative1Positive_NGRS" width="250"/> |
+
 ### Both Negative
+This test case shows two negative inputs, added with GRS on the left, and without GRS (hence, using RTNTE) on the right.
+
+| With GRS | Without GRS |
+| ---------| ------------|
+| <img src="tests/2Negative_GRS.png" alt="2Negative_GRS" width="250"/> | <img src="tests/2Negative_NGRS.png" alt="2Negative_NGRS" width="250"/> |
+
+
 ### 0 - inputs
+This test case shows the program would run with zero-value inputs.
+
+| With GRS | Without GRS |
+| ---------| ------------|
+| <img src="tests/0_GRS.png" alt="0_GRS" width="250"/> | <img src="tests/0_NGRS.png" alt="0_NGRS" width="250"/> |
+
+
 ### Some Input Checking
+There are also several simple forms of input checking available in the program. Some of these include checking that all fields have a value, the values are within the range, and that the values make sense (ie, binary is only 1's and 0's). Some examples of these error-checking outputs are shown below.
+
+| Sample Input Checks | | |
+|------------------------|------------------------|------------------------|
+|Missing Input | Incorrect Input | Out of Range/Not Supported |
+| <img src="tests/Error1.png" alt="Error1" width="250"/> | <img src="tests/Error2.png" alt="Error2" width="250"/> | <img src="tests/Error3.png" alt="Error3" width="250"/> |
+
+### Output to .txt file
+Finally, the following images shows a sample of saving the output to a text file, then showing the file's contents to be the same as the content displayed in the GUI.
+
+| Outputting to text | | | |
+|------------------------|------------------------|------------------------|------------------------|
+|Initial Output | Upon clicking 'Save Output' | Prompt on successful save | Viewing content of the saved file |
+| <img src="tests/TXT1.png" alt="TXT1" width="250"/> | <img src="tests/TXT2.png" alt="TXT2" width="250"/> | <img src="tests/TXT3.png" alt="TXT3" width="250"/> | <img src="tests/TXT4.png" alt="TXT4" width="250"/> |
+
+
 
 ## Problems Encountered
 There were several problems that were encountered by the group while creating this simulation project. One was the time constraints due to requirements in other subjects, but as for the coding itself, there were issues particularly in creating and implementing the normalization, rounding, single digit support, and negative inputs (and consequently, subtraction). The last of the set was particularly troublesome because the entire project was initially implemented to *not* allow negative numbers.
