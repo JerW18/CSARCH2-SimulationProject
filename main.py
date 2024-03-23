@@ -28,6 +28,10 @@ def float_to_binary(float_num, precision):
 # Positive shift: moves the decimal point to the left
 # Negative shift: moves the decimal point to the right
 def move_decimal_point(binary_str, shift):
+
+    if shift == 0:
+        return binary_str
+
     integer_part, fractional_part = binary_str.split('.')
     
     shifted_integer = ''
@@ -38,7 +42,7 @@ def move_decimal_point(binary_str, shift):
         if shift < 0 and fractional_part[0] != '1':
             shifted_integer = '0'
             shifted_fractional = fractional_part[1:] 
-            print("shifted_fractional", shifted_fractional)
+            # print("shifted_fractional", shifted_fractional)
             return shifted_integer + '.' + shifted_fractional
         elif shift < 0 and fractional_part[0] == '1':
             shifted_integer = '1'
@@ -55,7 +59,7 @@ def move_decimal_point(binary_str, shift):
             shifted_fractional = fractional_part[abs(shift):]
             
         # Normal shift
-        elif len(fractional_part) > abs(shift):
+        elif len(fractional_part) >= abs(shift):
             shifted_integer = integer_part + fractional_part[:abs(shift)]
             shifted_fractional = fractional_part[abs(shift):]
             
@@ -249,40 +253,7 @@ def normalize_binary(binary_str, exponent):
         binary_str += '.0'
     if binary_str[-1] == '.':
         binary_str = binary_str + '0'
-
-
     return binary_str, exponent
-
-# Normalize Result
-def normalize_result(result_binary, result_exponent, num_digits):
-    if '.' not in result_binary:
-        result_binary += '.0'
-    integer_part, fractional_part = result_binary.split('.')
-        
-        #1.f <- need to check for this
-    while integer_part[-1] != '1' and len(integer_part) > 1:
-        result_exponent += 1
-        result_binary = integer_part + '.' + fractional_part
-        result_binary = move_decimal_point(result_binary, 1)
-        integer_part, fractional_part = result_binary.split('.')
-    while integer_part[-1] != '1' and len(integer_part) > 1:
-        result_exponent -= 1
-        result_binary = integer_part + '.' + fractional_part
-        result_binary = move_decimal_point(result_binary, -1)
-        integer_part, fractional_part = result_binary.split('.')   
-        
-    while len(integer_part) > 1 and '-' not in integer_part:
-        result_exponent += 1
-        result_binary = integer_part + '.' + fractional_part
-        result_binary = move_decimal_point(result_binary, 1)
-        integer_part, fractional_part = result_binary.split('.')
-    while len(integer_part) > 1 and '-' not in integer_part:
-        result_exponent += 1
-        result_binary = integer_part + '.' + fractional_part
-        result_binary = move_decimal_point(result_binary, 1)
-        integer_part, fractional_part = result_binary.split('.')
-    result_binary = rtne_rounding(result_binary, num_digits) 
-    return result_binary, result_exponent
 
 def save_output():
     try:
@@ -407,16 +378,21 @@ def perform_addition():
         if num_digits > 1:
             if '.' not in result_binary:
                 result_binary += '.0'
-            if len(result_binary) < num_digits+4 and rounding_mode == "GRS":
-                result_binary += '0' * (num_digits+4 - len(result_binary))
-            elif len(result_binary) < num_digits+1 and rounding_mode == "RTNE":
-                result_binary += '0' * (num_digits+1 - len(result_binary))
+            fractional_part_round = round_binary1.split('.')[1]
+            fractional_part_result = result_binary.split('.')[1]
+            if len(fractional_part_round) > len(fractional_part_result):
+                result_binary += '0' * (len(fractional_part_round) - len(fractional_part_result))
         text_output.insert(tk.END, f"     Sum: [{result_binary}] x 2^{result_exponent}\n\n")
 
         # Normalize the result
         
         
-        result_binary, result_exponent = normalize_result(result_binary, result_exponent, num_digits)
+        result_binary, result_exponent = normalize_binary(result_binary, result_exponent)
+        result_binary = rtne_rounding(result_binary, num_digits) 
+
+        result_integer, result_fractional = result_binary.split('.')
+        if '1' not in result_integer and '1' not in result_fractional:
+            result_exponent = 0
 
         # Display final result
         text_output.insert(tk.END, "Final Answer:\n")
@@ -480,5 +456,36 @@ text_output.grid(row=8, column=0, columnspan=2, padx=5, pady=5)
 button_save_output = tk.Button(root, text="Save Output", command=save_output)
 button_save_output.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
 
-
 root.mainloop()
+
+print(move_decimal_point('101.101', 0))
+
+# Tests for functions...
+print()
+print("Test for move_decimal_point")
+print("1. " + move_decimal_point('101.101', -4) + " == 1011010.0 is " + str(move_decimal_point('101.101', -4) == '1011010.0'))
+print("2. " + move_decimal_point('101.101', -3) + " == 101101.0 is " + str(move_decimal_point('101.101', -3) == '101101.0'))
+print("3. " + move_decimal_point('101.101', -2) + " == 10110.1 is " + str(move_decimal_point('101.101', -2) == '10110.1'))
+print("4. " + move_decimal_point('101.101', -1) + " == 1011.01 is " + str(move_decimal_point('101.101', -1) == '1011.01'))
+print("5. " + move_decimal_point('101.101', 0) + " == 101.101 is " + str(move_decimal_point('101.101', 0) == '101.101'))
+print("6. " + move_decimal_point('101.101', 1) + " == 10.1101 is " + str(move_decimal_point('101.101', 1) == '10.1101'))
+print("7. " + move_decimal_point('101.101', 2) + " == 1.01101 is " + str(move_decimal_point('101.101', 2) == '1.01101'))
+print("8. " + move_decimal_point('101.101', 3) + " == 0.101101 is " + str(move_decimal_point('101.101', 3) == '0.101101'))
+print("9. " + move_decimal_point('101.101', 4) + " == 0.0101101 is " + str(move_decimal_point('101.101', 4) == '0.0101101'))
+print("10. " + move_decimal_point('0.0101', -4) + " == 101.0 is " + str(move_decimal_point('0.0101', -4) == '101.0'))
+print("11. " + move_decimal_point('0.0101', -3) + " == 10.1 is " + str(move_decimal_point('0.0101', -3) == '10.1'))
+print("12. " + move_decimal_point('0.0101', -2) + " == 1.01 is " + str(move_decimal_point('0.0101', -2) == '1.01'))
+print("13. " + move_decimal_point('0.0101', -1) + " == 0.101 is " + str(move_decimal_point('0.0101', -1) == '0.101'))
+print("14. " + move_decimal_point('0.0101', 0) + " == 0.0101 is " + str(move_decimal_point('0.0101', 0) == '0.0101'))
+print("15. " + move_decimal_point('0.0101', 1) + " == 0.00101 is " + str(move_decimal_point('0.0101', 1) == '0.00101'))
+print("16. " + move_decimal_point('0.0101', 2) + " == 0.000101 is " + str(move_decimal_point('0.0101', 2) == '0.000101'))
+print("17. " + move_decimal_point('0.0101', 3) + " == 0.0000101 is " + str(move_decimal_point('0.0101', 3) == '0.0000101'))
+print("18. " + move_decimal_point('0.0101', 4) + " == 0.00000101 is " + str(move_decimal_point('0.0101', 4) == '0.00000101'))
+
+print()
+print("Test for add_binary_numbers")
+print("1. " + add_binary_numbers('101.101', '110.011') + " == 1100.000 is " + str(add_binary_numbers('101.101', '110.011') == '1100.000'))
+print("2. " + add_binary_numbers('0.101', '0.011') + " == 1.000 is " + str(add_binary_numbers('0.101', '0.011') == '1.000'))
+print("3. " + add_binary_numbers('101.101', '0.011') + " == 101.000 is " + str(add_binary_numbers('101.101', '0.011') == '101.000'))
+
+
