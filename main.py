@@ -138,8 +138,8 @@ def add_binary_numbers(binary_num1, binary_num2):
 
     return sum_binary
 
-# Round to the Nearest Even (RTNE) Rounding
-def rtne_rounding(binary_str, num_bits):
+# Round to the Nearest Even (RTNTE) Rounding
+def rtnte_rounding(binary_str, num_bits):
     integer_part, fractional_part = binary_str.split('.')
     
     if num_bits == 1:
@@ -257,6 +257,18 @@ def perform_addition():
         if len(entry_binary1.get()) == 0 or len(entry_exponent1.get()) == 0 or len(entry_binary2.get()) == 0 or len(entry_exponent2.get()) == 0 or len(entry_num_digits.get()) == 0:
             text_output.insert(tk.END, "Error: Please fill in all input fields.")
             return
+        for char in entry_exponent1.get():
+            if char not in '0123456789-':
+                text_output.insert(tk.END, "Error: Incorrect input format for exponent 1. \nPlease input numericals only.")
+                return
+        for char in entry_exponent2.get():
+            if char not in '0123456789-':
+                text_output.insert(tk.END, "Error: Incorrect input format for exponent 2. \nPlease input numericals only.")
+                return
+        for char in entry_num_digits.get():
+            if char not in '0123456789':
+                text_output.insert(tk.END, "Error: Incorrect input format for number of digits. \nPlease input numericals only.")
+                return
 
         binary1 = entry_binary1.get()
         exponent1 = int(entry_exponent1.get())
@@ -268,7 +280,7 @@ def perform_addition():
 
         #check input validity
         if binary1.count('.') > 1 or binary2.count('.') > 1:
-            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            text_output.insert(tk.END, "Error: Incorrect input format. \nPlease input binary numbers.")
             return
         if len(binary1) == 0 or len(binary2) == 0 or len(entry_exponent1.get()) == 0 or len(entry_exponent2.get()) == 0 or len(entry_num_digits.get()) == 0:
             text_output.insert(tk.END, "Error: Please input both binary numbers and exponents.")
@@ -276,11 +288,11 @@ def perform_addition():
         
         for char in binary1:
             if char not in '01.-':
-                text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+                text_output.insert(tk.END, "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
                 return
         for char in binary2:
             if char not in '01.-':
-                text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+                text_output.insert(tk.END, "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
                 return
 
         if num_digits > 24 or num_digits < 1:
@@ -289,22 +301,24 @@ def perform_addition():
         
         if binary1.count('-') > 1:
             print("binary1", binary1)
-            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            text_output.insert(tk.END, "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
             return
         if binary2.count('-') > 1:
             print("binary2", binary2)
-            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            text_output.insert(tk.END, "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
             return
         
         if binary1.find('-') != 0 and binary1.find('-') != -1:
             print(binary1.find('-'))
             print("binary1-", binary1)
-            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            text_output.insert(tk.END, "Error: Incorrect input format for binary 1. \nPlease input binary numbers.")
             return
         if binary2.find('-') != 0 and binary2.find('-') != -1:
             print("binary2-", binary2)
-            text_output.insert(tk.END, "Error: Incorrect input format. Please input binary numbers.")
+            text_output.insert(tk.END, "Error: Incorrect input format for binary 2. \nPlease input binary numbers.")
             return
+        
+        
         
         #normalizing
         if '.' not in binary1:
@@ -333,9 +347,9 @@ def perform_addition():
         text_output.insert(tk.END, f"Binary 2: [{normalize_binary2}] x 2^{exponent2}\n\n")
 
         #rounding
-        if rounding_mode == "RTNE":
-            round_binary1 = rtne_rounding(normalize_binary1, num_digits)
-            round_binary2 = rtne_rounding(normalize_binary2, num_digits)
+        if rounding_mode == "RTNTE":
+            round_binary1 = rtnte_rounding(normalize_binary1, num_digits)
+            round_binary2 = rtnte_rounding(normalize_binary2, num_digits)
         elif rounding_mode == "GRS":
             round_binary1 = grs_rounding(normalize_binary1, num_digits)
             round_binary2 = grs_rounding(normalize_binary2, num_digits)
@@ -372,7 +386,7 @@ def perform_addition():
         if '.' not in result_binary:
             result_binary += '.0'
         result_binary, result_exponent = normalize_binary(result_binary, result_exponent)
-        result_binary = rtne_rounding(result_binary, num_digits) 
+        result_binary = rtnte_rounding(result_binary, num_digits) 
 
         if num_digits > 1:
             result_integer, result_fractional = result_binary.split('.')
@@ -416,10 +430,10 @@ entry_exponent2.grid(row=3, column=1, padx=5, pady=5)
 label_rounding_mode = tk.Label(root, text="Rounding Mode:")
 label_rounding_mode.grid(row=4, column=0, padx=5, pady=5)
 var_rounding_mode = tk.StringVar(value="GRS")
-radio_grs = tk.Radiobutton(root, text="GRS (Guard, Round, Sticky)", variable=var_rounding_mode, value="GRS")
+radio_grs = tk.Radiobutton(root, text="With GRS (Guard, Round, Sticky)", variable=var_rounding_mode, value="GRS")
 radio_grs.grid(row=4, column=1, padx=5, pady=5)
-radio_rtne = tk.Radiobutton(root, text="RTNE (Round to Nearest Even)", variable=var_rounding_mode, value="RTNE")
-radio_rtne.grid(row=5, column=1, padx=5, pady=5)
+radio_rtnte = tk.Radiobutton(root, text="Without GRS (uses RTNTE)", variable=var_rounding_mode, value="RTNTE")
+radio_rtnte.grid(row=5, column=1, padx=5, pady=5)
 
 #number of digits
 label_num_digits = tk.Label(root, text="Number of Digits Supported:")
