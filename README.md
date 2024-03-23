@@ -13,6 +13,11 @@ This Python project implements IEEE-754 binary-32 floating point arithmetic oper
 - Step-by-step output displayed in the GUI
 - Option for file export as a .txt file
 
+## Demo Video Uploaded Onto YouTube
+[CSARCH2: Demo Video for Simulation Project (S15 Group 1)](https://www.youtube.com/watch?v=pIHqg970VDg)
+
+[![Image](https://i3.ytimg.com/vi/pIHqg970VDg/maxresdefault.jpg)](https://www.youtube.com/watch?v=pIHqg970VDg)
+
 ## General Process of the Code
 - First, the code will normalize the binary number inputs to 1.f format.
 - Next, it will equalize the exponents to the higher exponent using a function that moves the decimal place given a shift value.
