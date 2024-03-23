@@ -5,6 +5,10 @@ from tkinter import filedialog
 
 # Float to Binary Conversion
 def float_to_binary(float_num, precision):
+    negative = False
+    if float_num < 0:
+        float_num = abs(float_num)
+        negative = True
     integer_part = int(float_num)
     fractional_part = float_num - integer_part
 
@@ -17,6 +21,8 @@ def float_to_binary(float_num, precision):
         binary_fractional += str(bit)
         fractional_part -= bit
 
+    if negative:
+        binary_integer = "-" + binary_integer
     if len(binary_fractional) == 0:
         return binary_integer
     else:
@@ -129,7 +135,7 @@ def add_binary_numbers(binary_num1, binary_num2):
     sum_dec = num1 + num2
 
     sum_binary = float_to_binary(sum_dec, precision=len(frac_part1))
-    
+
     return sum_binary
 
 # Round to the Nearest Even (RTNE) Rounding
@@ -208,9 +214,6 @@ def normalize_binary(binary_str, exponent):
         binary_str = integer_part + '.' + fractional_part
         binary_str = move_decimal_point(binary_str, -1)
         print("cc", binary_str)
-        #if fractional part is empty, pad 0
-        #if integer_part == '0' and fractional_part == '1':
-            #return '1.0', exponent - 1
         integer_part, fractional_part = binary_str.split('.')
 
     #while number of 1's in integer part is greater than 1, shift
@@ -342,20 +345,27 @@ def perform_addition():
         text_output.insert(tk.END, f"Binary 2: [{round_binary2}] x 2^{exponent2}\n")
 
         #adding the binary numbers
+        
+        length1 = -10101010
         if '.' not in round_binary1:
+            length1 = 0
             round_binary1 += '.0'
         if '.' not in round_binary2:
             round_binary2 += '.0'
+        
         result_binary = add_binary_numbers(round_binary1, round_binary2)
         result_exponent = max(exponent1, exponent2)
         text_output.insert(tk.END, "-------------------------------------------------\n")
-        if num_digits > 1:
-            if '.' not in result_binary:
-                result_binary += '.0'
-            fractional_part_round = round_binary1.split('.')[1]
-            fractional_part_result = result_binary.split('.')[1]
-            if len(fractional_part_round) > len(fractional_part_result):
-                result_binary += '0' * (len(fractional_part_round) - len(fractional_part_result))
+        #if num_digits > 1:
+        if '.' not in result_binary:
+           result_binary += '.0'
+        fractional_part_round = round_binary1.split('.')[1]
+        integer_part_result, fractional_part_result = result_binary.split('.')
+        if len(fractional_part_round) > len(fractional_part_result):
+            result_binary += '0' * (len(fractional_part_round) - len(fractional_part_result))
+        if length1 == 0:
+            result_binary = integer_part_result
+        print( len(fractional_part_round))
         text_output.insert(tk.END, f"     Sum: [{result_binary}] x 2^{result_exponent}\n\n")
 
         #normalizing answer
